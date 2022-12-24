@@ -22,8 +22,6 @@ const CreateGarden = () => {
         <Text
           style={{
             fontSize: 15,
-            color: 'white',
-
             color: '#FFF1DD',
           }}>
           Add a photo of your garden

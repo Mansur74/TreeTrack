@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { View, Image } from "react-native";
-import Camera from "../activities/Camera";
-import Map from "../activities/Map";
-import Gardens from "../activities/Gardens";
-import Profile from "../activities/Profile";
-import Galleries from "../activities/Galleries";
+import Camera from "../pages/Camera";
+import Map from "../pages/Map";
+import Gardens from "../pages/Gardens";
+import Profile from "../pages/Profile";
+import Galleries from "../pages/Galleries";
 import styles from "../styles/Style";
-import CreateGarden from "../activities/CreateGarden"
+import CreateGarden from "../pages/CreateGarden"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Tab = createBottomTabNavigator()

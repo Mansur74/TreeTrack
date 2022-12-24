@@ -22,15 +22,31 @@ const styles = StyleSheet.create(
 
         text: { 
             fontSize: 30, 
-            color: "white", 
             fontWeight: "bold", 
-            color: "#FFF1DD"
+            color: "#FFF1DD",
+            marginBottom: 20
         },
+
         t4: { 
-            fontSize: 10, 
-            color: "white", 
-            fontWeight: "bold", 
-            color: "#FFF1DD"
+            fontSize: 17, 
+            color: "white",
+            marginBottom: 20
+        },
+        button: 
+        {
+            width: 250,
+            paddingTop: 10,
+            paddingBottom: 10,
+            paddingRight: 20,
+            paddingLeft: 20,
+            borderRadius: 50,
+            marginBottom: 20,
+            backgroundColor: "#44A77A",
+            fontWeight: "bold"
+        }, 
+        bt1: {
+            color: "white",
+            textAlign: "center"
         }
 
     }
