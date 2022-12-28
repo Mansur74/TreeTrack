@@ -8,6 +8,7 @@ import Profile from "../pages/Profile";
 import Galleries from "../pages/Galleries";
 import styles from "../styles/Style";
 import CreateGarden from "../pages/CreateGarden"
+import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Tab = createBottomTabNavigator()
@@ -25,8 +26,8 @@ const BottomNavigation = () => {
 
         >
             <Tab.Screen
-                name="Camera"
-                component={Camera}
+                name="CameraStack"
+                component={CameraStack}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -146,6 +147,17 @@ const GardensStack = () => {
     )
 }
 
+const CameraStack = () =>{
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen name="Camera" component={Camera} />
+        <Stack.Screen name="SelectPlant" component={SelectPlant} />
+      </Stack.Navigator>
+    );
+}
 
 
 export default BottomNavigation

@@ -1,4 +1,4 @@
-import { View, Text} from "react-native"
+import { View, Text, TouchableOpacity, TextInput, ScrollView} from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 import React, { useState } from 'react';
@@ -7,7 +7,7 @@ import UnPick from "../layouts/UnPick";
 import {Picker} from '@react-native-picker/picker';
 import ImagePicker from 'react-native-image-crop-picker';
 
-const Camera = () => {
+const Camera = ({navigation}) => {
 
     const handleUnPick = () => setImageSelected(false)
     
@@ -45,28 +45,56 @@ const Camera = () => {
 
     return (
       <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
-        <View style={styles.container}>
-          <Text style={styles.text}>add photo</Text>
-          {isImageSelected ? (
-            <Pick unPick={handleUnPick} image={image} />
-          ) : (
-            <UnPick openCamera={openCamera} openGallery={openGallery} />
-          )}
+        <ScrollView>
+          <View style={styles.container}>
+            <Text style={styles.text}>add photo</Text>
+            {isImageSelected ? (
+              <Pick unPick={handleUnPick} image={image} />
+            ) : (
+              <UnPick openCamera={openCamera} openGallery={openGallery} />
+            )}
 
-          <Text style={styles.t4}>Select a garden</Text>
-        
-        
-          <Picker
-            selectedValue={selectedValue}
-            style={{height: 30, width: 200, backgroundColor: '#fff'}}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedValue(itemValue)
-            }>
-            {gardens.map(garden => (
-              <Picker.Item key={garden} label={garden} value={garden} />
-            ))}
-          </Picker>
-        </View>
+            <Text style={styles.t4}>Select a garden</Text>
+
+            <Picker
+              selectedValue={selectedValue}
+              style={{
+                height: 30,
+                width: 200,
+                backgroundColor: '#fff',
+                color: 'black',
+              }}
+              onValueChange={(itemValue, itemIndex) =>
+                setSelectedValue(itemValue)
+              }>
+              {gardens.map(garden => (
+                <Picker.Item key={garden} label={garden} value={garden} />
+              ))}
+            </Picker>
+            <Text style={styles.t4}>Enter your notes</Text>
+            <TextInput
+              multiline
+              numberOfLines={4}
+              placeholder="Plant notes"
+              style={{
+                height: 100,
+                width: '100%',
+                backgroundColor: 'white',
+                borderRadius: 6,
+                borderWidth: 0,
+                color: 'black',
+              }}
+            />
+            {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}
+            <TouchableOpacity
+              style={styles.button_right}
+              onPress={() => {
+                navigation.navigate('SelectPlant');
+              }}>
+              <Text style={styles.bt1}> Select Plant </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </LinearGradient>
     );
 }
