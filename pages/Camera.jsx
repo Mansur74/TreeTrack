@@ -5,24 +5,52 @@ import React, { useState } from 'react';
 import Pick from "../layouts/Pick";
 import UnPick from "../layouts/UnPick";
 import {Picker} from '@react-native-picker/picker';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const Camera = () => {
-    const [isAuthenticated, setAuthenticated] = useState(true)
 
-    const handleUnPick = () => setAuthenticated(false)
-    const handlePick = () => setAuthenticated(true)
+    const handleUnPick = () => setImageSelected(false)
     
     const gardens = ['Garden 1', 'My Walnut']; 
     const [selectedValue, setSelectedValue] = useState(gardens[0]);
+
+    const [image, setImage] = useState(null);
+    const [isImageSelected, setImageSelected] = useState(false);
+
+  const openCamera = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+      setImageSelected(true);
+      //this.bs.current.snapTo(1);
+    });
+  };
+
+  const openGallery = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+      setImageSelected(true);
+    });
+  };
+
 
     return (
       <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
         <View style={styles.container}>
           <Text style={styles.text}>add photo</Text>
-          {isAuthenticated ? (
-            <UnPick pick={handlePick} />
+          {isImageSelected ? (
+            <Pick unPick={handleUnPick} image={image} />
           ) : (
-            <Pick unPick={handleUnPick} />
+            <UnPick openCamera={openCamera} openGallery={openGallery} />
           )}
 
           <Text style={styles.t4}>Select a garden</Text>

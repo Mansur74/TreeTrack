@@ -1,12 +1,14 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import styles from '../styles/Style';
 
-const Pick = ({ unPick }) => {
+const Pick = ({ unPick, image }) => {
     return (
         <View style={{ alignItems: "center" }}>
             <Image
-                source={require("../images/default_plant.png")}
-                style={{ marginBottom: 20 }}
+                source={{
+                    uri: image,
+                  }}
+                style={{ width:200,height:200, marginBottom: 20, borderRadius: 20}}
             >
 
             </Image>
