@@ -62,7 +62,7 @@ const Camera = ({ navigation }) => {
           <View
             style={{
               width: 200,
-              borderRadius: 25,
+              borderRadius: 10,
               backgroundColor: '#fff'
 
             }}>
@@ -91,6 +91,8 @@ const Camera = ({ navigation }) => {
               borderRadius: 10,
               borderWidth: 0,
               color: 'black',
+              elevation: 5,
+         
             }}
           />
           {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}

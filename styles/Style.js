@@ -13,7 +13,10 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginBottom: 50,
     borderRadius: 30,
-    padding: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingLeft: 35,
+    paddingRight: 35
   },
 
   bottomNavigationİcons: {

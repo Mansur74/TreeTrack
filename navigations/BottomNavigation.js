@@ -30,7 +30,7 @@ const BottomNavigation = () => {
                     tabBarShowLabel: false,
                     tabBarStyle: styles.bottomNavigation,
                     headerShown: false,
-                    tabBarHideOnKeyboard: true
+                    tabBarHideOnKeyboard: true,
 
                 }}>
 
