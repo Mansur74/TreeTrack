@@ -16,7 +16,7 @@ const CreateGarden = () => {
     <LinearGradient
       colors={['#D1A96DE5', '#DB966FE5']}
       style={{height: '100%'}}>
-      <View style={styles.container}>
+      <View style={{padding: 20, flex: 1, marginBottom: 110}}>
         <Text style={styles.text}>Add a new garden</Text>
 
         <Text

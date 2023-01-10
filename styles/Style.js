@@ -8,10 +8,12 @@ const styles = StyleSheet.create({
   bottomNavigation: {
     position: 'absolute',
     height: 60,
-    margin: 20,
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 50,
     borderRadius: 30,
-    paddingLeft: 20,
-    paddingRight: 25,
+    padding: 20,
   },
 
   bottomNavigationİcons: {
