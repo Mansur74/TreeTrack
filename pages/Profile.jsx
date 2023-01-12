@@ -3,8 +3,6 @@ import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 
 const Profile = () => {
-    const gradientHeight = 700;
-    const gradientBackground = "green"
     return (
 
         <LinearGradient

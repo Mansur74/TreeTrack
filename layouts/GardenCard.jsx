@@ -1,11 +1,13 @@
 import { Image, Text, TouchableOpacity, View } from "react-native"
+import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu"
 
-const GardenCard = ({gardenName}) => {
+const GardenCard = ({ garden }) => {
     return (
         <View
             style={{
                 flexDirection: "row",
-                justifyContent: "center"
+                justifyContent: "center",
+                marginBottom: 10
             }}
         >
             <View
@@ -21,26 +23,51 @@ const GardenCard = ({gardenName}) => {
                         width: "100%",
                         marginBottom: 10
                     }}
-                    source={require('../images/default_plant.png')}>
+                    source={require("../images/default_plant.png")}>
 
                 </Image>
 
                 <View
-                    style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    style={{ flexDirection: "row", justifyContent: "space-between"}}>
 
                     <Text>
-                        {gardenName}
+                        {garden.name}
                     </Text>
 
-                    <TouchableOpacity>
-                        <Image
-                            style={{
-                            }}
-                            source={require('../images/icons/ic_options.png')}>
+                    
+                        <Menu>
+                            <MenuTrigger style={{}}>
+                                <Image
+                                    style={{
+                                    }}
+                                    source={require('../images/icons/ic_options.png')}>
 
-                        </Image>
+                                </Image>
+                            </MenuTrigger>
+                            <MenuOptions optionsContainerStyle={{width:150, backgroundColor: "#FFF1DD", borderRadius: 5}}>
+                                <View  style={{ borderColor: "#888888", borderWidth: 1}}>
+                                <MenuOption onSelect={() => alert(`Edit`)}>
+                                    <Text style={{ textAlign: "center" }}>Edit</Text>
+                                    </MenuOption>
+                                <View style={{backgroundColor: "#888888", height: 1, width: "100%"}}/>
+                                <MenuOption onSelect={() => alert(`Rename`)}>
+                                    <Text style={{ textAlign: "center" }}>Rename</Text>
+                                    </MenuOption>
+                                <View style={{backgroundColor: "#888888", height: 1, width: "100%"}}/>
+                                <MenuOption onSelect={() => alert(`Share`)}>
+                                    <Text style={{ textAlign: "center" }}>Share</Text>
+                                    </MenuOption>
+                                <View style={{backgroundColor: "#888888", height: 1, width: "100%"}}/>
+                                <MenuOption onSelect={() => alert(`Delete`)}>
+                                    <Text style={{ textAlign: "center", color: 'red' }}>Delete</Text>
+                                </MenuOption>
+                                </View>
 
-                    </TouchableOpacity>
+
+                            </MenuOptions>
+                        </Menu>
+
+
                 </View>
 
             </View>

@@ -4,8 +4,6 @@ import styles from "../styles/Style";
 import { Picker } from '@react-native-picker/picker';
 
 const Galleries = () => {
-    const gradientHeight = 700;
-    const gradientBackground = "green"
     return (
 
         <LinearGradient

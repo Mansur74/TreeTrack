@@ -1,10 +1,13 @@
-import { View, Text, Image } from "react-native"
+import { View, Text, Image, FlatList, ScrollView } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 import { TouchableOpacity } from "react-native";
 import GardenCard from "./GardenCard";
+import { MenuProvider } from "react-native-popup-menu";
 
-const FilledGardens = ({ navigation, gardens}) => {
+
+
+const FilledGardens = ({ navigation, gardens }) => {
     return (
         <LinearGradient
             colors={["#FFFFFF", "#FFFFFF"]}
@@ -33,16 +36,25 @@ const FilledGardens = ({ navigation, gardens}) => {
                             borderTopRightRadius: 50
                         }}>
 
-                        {
-                            // there is a problem about mapping the JSX elements here.
-                            gardens.map(garden =>
-                                <GardenCard gardenName={garden} />
-                            )
-                        }
+                        <ScrollView
+                            style={{
+                                marginBottom: 100
+                            }}>
+
+                            <MenuProvider>
+                                {
+                                    gardens.map(garden =>
+                                        <GardenCard key={garden.name} garden={garden} />
+                                    )
+                                }
+                            </MenuProvider>
+
+
+                        </ScrollView>
 
                         <TouchableOpacity
-                            style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130}}
-                            onPress={() =>{
+                            style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130 }}
+                            onPress={() => {
                                 navigation.navigate("CreateGarden")
                             }}
                         >
