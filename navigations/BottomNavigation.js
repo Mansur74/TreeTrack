@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { View, Image, Dimensions } from "react-native";
-import Camera from "../pages/Camera";
+import AddPlantNote from "../pages/AddPlantNote";
 import Map from "../pages/Map";
 import Gardens from "../pages/Gardens";
 import Profile from "../pages/Profile";
@@ -10,6 +10,7 @@ import styles from "../styles/Style";
 import CreateGarden from "../pages/CreateGarden"
 import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import GardenArea from "../pages/GardenArea";
 
 
 const { width, height } = Dimensions.get("window")
@@ -35,8 +36,8 @@ const BottomNavigation = () => {
                 }}>
 
                 <Tab.Screen
-                    name="CameraStack"
-                    component={CameraStack}
+                    name="AddPlantNoteStack"
+                    component={AddPlantNoteStack}
                     options={{
                         tabBarIcon: ({ focused }) => (
                             <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -142,28 +143,24 @@ const BottomNavigation = () => {
 }
 const GardensStack = () => {
     return (
-        <Stack.Navigator
-            screenOptions={{
-                headerShown: false
-            }}>
-            <Stack.Screen
-                name="Gardens"
-                component={Gardens}
-            />
-            <Stack.Screen
-                name="CreateGarden"
-                component={CreateGarden} />
-        </Stack.Navigator>
-    )
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen name="Gardens" component={Gardens} />
+        <Stack.Screen name="CreateGarden" component={CreateGarden} />
+        <Stack.Screen name="GardenArea" component={GardenArea} />
+      </Stack.Navigator>
+    );
 }
 
-const CameraStack = () => {
+const AddPlantNoteStack = () => {
     return (
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
             }}>
-            <Stack.Screen name="Camera" component={Camera} />
+            <Stack.Screen name="AddPlantNote" component={AddPlantNote} />
             <Stack.Screen name="SelectPlant" component={SelectPlant} />
         </Stack.Navigator>
     );
