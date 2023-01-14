@@ -1,176 +1,165 @@
-import { Picker } from '@react-native-picker/picker';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  ScrollView,
+  ToastAndroid,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import DrawPoligon from './DrawPoligon';
+import React, {useState, useEffect} from 'react';
+import PhotoPick from '../layouts/ImagePicker';
+import {useRoute} from '@react-navigation/native';
 
-const Stack = createNativeStackNavigator()
+// fake data - TODO: retrieve from API
+const gardenTypeList = [
+  {id: 1, name: 'Farm'},
+  {id: 2, name: 'Container Garden'},
+  {id: 3, name: 'Ferennial garden'},
+  {id: 4, name: 'Rose garden'},
+  {id: 5, name: 'Water garden'},
+];
+const CreateGarden = ({navigation}) => {
+  const route = useRoute(); // polygon coordinates will come from GardenArea page
+  const polygon = route.params ? route.params.coordinates : [];
+  const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
+  const [imagePath, setSelectedImage] = useState(null);
+  const [gardenName, setGardenName] = useState(null);
+  const [gardenNote, setGardenNote] = useState(null);
+  const onSelectImage = image => {
+    if (!image) {
+      setSelectedImage(null);
+    } else {
+      setSelectedImage(image.path);
+    }
+  };
 
-const CreateGarden = ({ navigation }) => {
+  // TODO: API post request
+  const saveGarden = () => {
+    const gardenObj = {
+      gardenName,
+      gardenType: pickerValue,
+      gardenImage: imagePath,
+      gardenNote,
+      userIds: [1],
+      polygon,
+    };
+    console.log('Saved garden: ', gardenObj);
+    ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
+    navigation.navigate('Gardens');
+  };
+
   return (
     <LinearGradient
       colors={['#D1A96DE5', '#DB966FE5']}
-      style={{ height: '100%' }}>
-      <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
-
-        <Text style={{
-          fontSize: 30,
-          fontWeight: 'bold',
-          color: '#FFFFFF',
-          marginBottom: 10,
-        }}>add a new garden</Text>
+      style={{height: '100%'}}>
+      <View style={{padding: 20, flex: 1, marginBottom: 110}}>
+        <Text style={styles.text}>add a new garden</Text>
 
         <ScrollView>
           <View
             style={{
               padding: 10,
-              width: "85%",
+              width: '100%',
             }}>
-            <Text
+            <Text style={styles.t4}>Add a photo of your garden</Text>
+            <PhotoPick onSelect={onSelectImage}></PhotoPick>
+            <Text style={styles.t4}>Give a name to your garden</Text>
+            <TextInput
+              value={gardenName}
+              onChangeText={text => setGardenName(text)}
+              placeholderTextColor={'#21212160'}
+              placeholder="Garden Name"
               style={{
-                fontSize: 16,
-                color: '#FFFFFF',
-                marginBottom: 5
-              }}>
-              Add a photo of your garden
-            </Text>
-
-            <TouchableOpacity
-              style={{
-                height: 150,
-                backgroundColor: "#D9D9D9",
+                width: '100%',
+                height: 42,
+                paddingStart: 10,
+                paddingEnd: 10,
+                backgroundColor: 'white',
                 borderRadius: 10,
-                marginBottom: 10
-              }}>
-              <Image
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  bottom: 0
-                }}
-                source={require('../images/icons/ic_add_image.png')}
-              >
-
-              </Image>
-            </TouchableOpacity>
-
-            <Text
-              style={{
+                borderWidth: 0,
+                color: '#212121',
+                textAlignVertical: 'top',
+                elevation: 5,
                 fontSize: 16,
-                color: '#FFFFFF',
-                marginBottom: 5
-              }}>
-              Give a name to your garden
-            </Text>
-
-        
-            <View
-              style={{
-                borderRadius: 10,
-                backgroundColor: '#fff',
-                marginBottom: 10
-
-              }}>
+              }}></TextInput>
+            <Text style={styles.t4}>Select garden type</Text>
+            <View style={styles.picker_view}>
               <Picker
-                style={{ color: "#5F5F5F" }}
-                selectedValue={"Farm"}
-              >
-                <Picker.Item key={"Farm"} label={"Farm"} value={"Farm"} />
+                dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
+                dropdownIconColor={'#21212110'}
+                style={{color: '#212121'}}
+                selectedValue={pickerValue}
+                onValueChange={itemValue => {
+                  setPickerValue(itemValue);
+                }}>
+                {gardenTypeList.map(gardenType => (
+                  <Picker.Item
+                    key={gardenType.id}
+                    label={gardenType.name}
+                    value={gardenType.id}
+                    color="#fff"
+                  />
+                ))}
               </Picker>
             </View>
 
-            <Text
-              style={{
-                fontSize: 16,
-                color: '#FFFFFF',
-                marginBottom: 5
-              }}>
-              Add location of your garden
-            </Text>
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#FFFFFF",
-                borderRadius: 10,
-                marginBottom: 10,
-                padding: 10,
-                alignSelf: 'baseline'
-              }}>
-              <View
+            <Text style={styles.t4}>Add location of your garden</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity
                 style={{
-                  flexDirection: "row",
+                  ...styles.button_left,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}
-              >
+                onPress={() => {
+                  navigation.navigate('DrawPolygon');
+                }}>
                 <Image
-                  style={{
-                    height: 20,
-                    width: 20,
-                    marginEnd: 5
+                  source={{
+                    uri: 'https://cdn-icons-png.flaticon.com/32/854/854901.png',
                   }}
-                  source={require('../images/icons/ic_map.png')}
-                >
-                </Image>
-                <Text
                   style={{
-                    fontSize: 16,
-                    color: "#5F5F5F"
-                  }}>
+                    width: 25,
+                    height: 25,
+                  }}></Image>
+                <Text style={{...styles.bt1, color: '#212121', marginLeft: 5}}>
                   Open Map
                 </Text>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+              {polygon.length > 2 && (
+                <Image
+                  source={{
+                    uri: 'https://cdn-icons-png.flaticon.com/32/8968/8968523.png',
+                  }}
+                  style={{
+                    width: 38,
+                    height: 38,
+                  }}></Image>
+              )}
+            </View>
 
-          </View>
-
-          <View
-            style={{
-              padding: 10,
-            }}>
-
-            <Text
-              style={{
-                fontSize: 16,
-                color: '#FFFFFF',
-                marginBottom: 5
-              }}>
-              Add garden notes
-            </Text>
-
+            <Text style={styles.t4}>Enter your notes</Text>
             <TextInput
+              value={gardenNote}
+              onChangeText={text => setGardenNote(text)}
+              placeholderTextColor={'#21212160'}
               multiline
-              numberOfLines={4}
-              placeholder="Garden notes"
-              style={{
-                height: 150,
-                backgroundColor: '#D9D9D9',
-                borderRadius: 10,
-                borderWidth: 0,
-                color: '#C4C4C4',
-                padding: 10,
-                elevation: 10,
-                marginBottom: 20
-              }}
+              numberOfLines={3}
+              placeholder="Garden notes..."
+              style={styles.text_area}
             />
 
             <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("DrawPoligon")
-            }}
-              style={{
-                backgroundColor: '#44A77A',
-                fontWeight: 'bold',
-                alignSelf: 'flex-end',
-                paddingTop: 10,
-                paddingBottom: 10,
-                paddingLeft: 20,
-                paddingRight: 20,
-                borderRadius: 20
-              }}>
-              <Text style={styles.bt1}> Save </Text>
+              style={{...styles.button_right, width: 125}}
+              onPress={saveGarden}>
+              <Text style={{...styles.bt1}}>
+                Save
+              </Text>
             </TouchableOpacity>
-
-
           </View>
         </ScrollView>
       </View>

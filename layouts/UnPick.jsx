@@ -9,10 +9,7 @@ import styles from '../styles/Style';
 const UnPick = ({openCamera, openGallery}) => {
   return (
     <View style={{alignItems: 'center'}}>
-      <Text style={styles.t4}>
-        Take a photo of your plant or select it from your gallery.
-      </Text>
-    
+      
         <TouchableOpacity
           onPress={openCamera}
           title="Open Camera"

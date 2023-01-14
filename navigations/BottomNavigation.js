@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { View, Image, Dimensions } from "react-native";
-import Camera from "../pages/Camera";
+import AddPlantNote from '../pages/AddPlantNote';
 import Map from "../pages/Map";
 import Gardens from "../pages/Gardens";
 import Profile from "../pages/Profile";
@@ -10,7 +10,7 @@ import styles from "../styles/Style";
 import CreateGarden from "../pages/CreateGarden"
 import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import DrawPoligon from "../pages/DrawPoligon";
+import DrawPolygon from "../pages/DrawPolygon";
 import Settings from "../pages/Settings";
 
 
@@ -37,8 +37,8 @@ const BottomNavigation = () => {
         }}>
 
         <Tab.Screen
-          name="CameraStack"
-          component={CameraStack}
+          name="AddPlantNoteStack"
+          component={AddPlantNoteStack}
           options={{
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -157,22 +157,22 @@ const GardensStack = () => {
         component={CreateGarden} />
 
       <Stack.Screen
-        name="DrawPoligon"
-        component={DrawPoligon} />
+        name="DrawPolygon"
+        component={DrawPolygon} />
     </Stack.Navigator>
   )
 }
 
-const CameraStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name="Camera" component={Camera} />
-      <Stack.Screen name="SelectPlant" component={SelectPlant} />
-    </Stack.Navigator>
-  );
+const AddPlantNoteStack = () => {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}>
+            <Stack.Screen name="AddPlantNote" component={AddPlantNote} />
+            <Stack.Screen name="SelectPlant" component={SelectPlant} />
+        </Stack.Navigator>
+    );
 }
 
 const SettingsStack = () => {
@@ -189,5 +189,3 @@ const SettingsStack = () => {
 
 
 export default BottomNavigation
-
-

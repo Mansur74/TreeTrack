@@ -77,32 +77,36 @@ const Galleries = () => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between", padding: 20 }}>
 
-            <View
-              style={{
-                width: 150,
-                borderRadius: 50,
-                backgroundColor: '#fff'
-
-              }}>
-              <Picker
-                selectedValue={"All Gardens"}>
-                <Picker.Item key={"All Gardens"} label={"All Gardens"} value={"All Gardens"} />
+                        <View
+                            style={{
+                                width: '48%',
+                                height: 45,
+                                borderRadius: 50,
+                                backgroundColor: '#fff',
+                                justifyContent: "center"
+                            }}>
+                            <Picker
+                            style={{color: '#212121'}}
+                                selectedValue={"All Gardens"}>
+                                <Picker.Item key={"All Gardens"} label={"All Gardens"} value={"All Gardens"}/>
 
               </Picker>
 
 
             </View>
 
-            <View
-              style={{
-                width: 150,
-                borderRadius: 50,
-                backgroundColor: '#fff'
-
-              }}>
-              <Picker
-                selectedValue={"Newest to Oldest"}>
-                <Picker.Item key={"Newest to Oldest"} label={"Newest to Oldest"} value={"Newest to Oldest"} />
+                        <View
+                            style={{
+                                width: '48%',
+                                height: 45,
+                                borderRadius: 50,
+                                backgroundColor: '#fff',
+                                justifyContent: "center"
+                            }}>
+                            <Picker
+                                style={{color: '#212121'}}
+                                selectedValue={"Newest to Oldest"}>
+                                <Picker.Item key={"Newest to Oldest"} label={"Newest to Oldest"} value={"Newest to Oldest"}/>
 
               </Picker>
 
