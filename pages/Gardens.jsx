@@ -4,9 +4,20 @@ import styles from "../styles/Style";
 import { TouchableOpacity } from "react-native";
 import EmptyGardens from "../layouts/EmptyGardens";
 import FilledGardens from "../layouts/FilledGardens";
+import database from '@react-native-firebase/database';
+import { useEffect, useState } from "react";
 
 const Gardens = ({ navigation }) => {
-  const gardens = [{ name: "My Olives", img: "" }, { name: "garden2", img: "" }, { name: "garden3", img: "" }];
+  const [gardens, setGardens] = useState([])
+  useEffect(() => {
+    database()
+    .ref('/gardens/garden1')
+    .on('value', snapshot => {
+      console.log(snapshot.val());
+      setGardens([snapshot.val()])
+    });
+  }, []);
+
   return (
     gardens.length == 0
       ? <EmptyGardens navigation={navigation} />

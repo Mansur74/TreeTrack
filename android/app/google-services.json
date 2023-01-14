@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "186713824259",
+    "project_id": "treetrackdb",
+    "storage_bucket": "treetrackdb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:186713824259:android:30f3e9262c619c838a8236",
+        "android_client_info": {
+          "package_name": "com.treetrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "186713824259-e4n0bjaa6ovvk4b1cl7bhnis8b6cml45.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.treetrack",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "186713824259-eti8a2tsc827gmam7969tuqr6foc1apc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoM-lpCexOWPBbRsJHdmJcV9Nxi9jD_7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "186713824259-eti8a2tsc827gmam7969tuqr6foc1apc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

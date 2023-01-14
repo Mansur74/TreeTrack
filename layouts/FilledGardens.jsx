@@ -4,8 +4,7 @@ import styles from "../styles/Style";
 import { TouchableOpacity } from "react-native";
 import GardenCard from "./GardenCard";
 import { MenuProvider } from "react-native-popup-menu";
-
-
+import database from '@react-native-firebase/database';
 
 const FilledGardens = ({ navigation, gardens }) => {
   return (
@@ -55,6 +54,7 @@ const FilledGardens = ({ navigation, gardens }) => {
             <TouchableOpacity
               style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130 }}
               onPress={() => {
+
                 navigation.navigate("CreateGarden")
               }}
             >
