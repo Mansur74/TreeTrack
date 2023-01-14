@@ -10,6 +10,8 @@ import styles from "../styles/Style";
 import CreateGarden from "../pages/CreateGarden"
 import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import DrawPoligon from "../pages/DrawPoligon";
+import Settings from "../pages/Settings";
 import GardenArea from "../pages/GardenArea";
 
 
@@ -18,23 +20,22 @@ const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
 const BottomNavigation = () => {
-    
-    return (
 
-        <View style={{
-            width,
-            height,
+  return (
+
+    <View style={{
+      width,
+      height,
+    }}>
+
+      <Tab.Navigator
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarStyle: styles.bottomNavigation,
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+
         }}>
-
-            <Tab.Navigator
-                screenOptions={{
-                    tabBarShowLabel: false,
-                    tabBarStyle: styles.bottomNavigation,
-                    headerShown: false,
-                    tabBarHideOnKeyboard: true,
-
-                }}>
-
                 <Tab.Screen
                     name="AddPlantNoteStack"
                     component={AddPlantNoteStack}
@@ -46,102 +47,131 @@ const BottomNavigation = () => {
                                     resizeMode="contain"
                                     style={styles.bottomNavigationİcons}
 
-                                >
+        <Tab.Screen
+          name="CameraStack"
+          component={CameraStack}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <Image
+                  source={focused ? require("../images/icons/focused_camera.png") : require("../images/icons/camera.png")}
+                  resizeMode="contain"
+                  style={styles.bottomNavigationİcons}
 
-                                </Image>
-                            </View>
-                        ),
-                    }}>
+                >
 
-                </Tab.Screen>
+                </Image>
+              </View>
+            ),
+          }}>
 
-                <Tab.Screen
-                    name="Map"
-                    component={Map}
-                    options={{
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={require("../images/icons/location.png")}
-                                    resizeMode="contain"
-                                    style={styles.bottomNavigationİcons}
+        </Tab.Screen>
 
-                                >
+        <Tab.Screen
+          name="Map"
+          component={Map}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <Image
+                  source={require("../images/icons/location.png")}
+                  resizeMode="contain"
+                  style={styles.bottomNavigationİcons}
 
-                                </Image>
-                            </View>
-                        ),
-                    }}>
+                >
 
-                </Tab.Screen>
+                </Image>
+              </View>
+            ),
+          }}>
 
-
-                <Tab.Screen
-                    name="GardensStack"
-                    component={GardensStack}
-                    options={{
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={require("../images/icons/plant.png")}
-                                    resizeMode="contain"
-                                    style={styles.bottomNavigationİcons}
-
-                                >
-
-                                </Image>
-                            </View>
-                        ),
-                    }}>
-
-                </Tab.Screen>
-
-                <Tab.Screen
-                    name="Galleries"
-                    component={Galleries}
-                    options={{
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={require("../images/icons/image.png")}
-                                    resizeMode="contain"
-                                    style={styles.bottomNavigationİcons}
-
-                                >
-
-                                </Image>
-                            </View>
-                        ),
-                    }}>
-
-                </Tab.Screen>
-
-                <Tab.Screen
-                    name="Profile"
-                    component={Profile}
-                    options={{
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={require("../images/icons/user.png")}
-                                    resizeMode="contain"
-                                    style={styles.bottomNavigationİcons}
-
-                                >
-
-                                </Image>
-                            </View>
-                        ),
-                    }}>
-
-                </Tab.Screen>
-            </Tab.Navigator>
-        </View>
+        </Tab.Screen>
 
 
-    )
+        <Tab.Screen
+          name="GardensStack"
+          component={GardensStack}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <Image
+                  source={require("../images/icons/plant.png")}
+                  resizeMode="contain"
+                  style={styles.bottomNavigationİcons}
+
+                >
+
+                </Image>
+              </View>
+            ),
+          }}>
+
+        </Tab.Screen>
+
+        <Tab.Screen
+          name="Galleries"
+          component={Galleries}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <Image
+                  source={require("../images/icons/image.png")}
+                  resizeMode="contain"
+                  style={styles.bottomNavigationİcons}
+
+                >
+
+                </Image>
+              </View>
+            ),
+          }}>
+
+        </Tab.Screen>
+
+        <Tab.Screen
+          name="SettingsStack"
+          component={SettingsStack}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <Image
+                  source={require("../images/icons/ic_settings.png")}
+                  resizeMode="contain"
+                  style={styles.bottomNavigationİcons}
+
+                >
+
+                </Image>
+              </View>
+            ),
+          }}>
+
+        </Tab.Screen>
+      </Tab.Navigator>
+    </View>
+
+
+  )
 }
 const GardensStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}>
+      <Stack.Screen
+        name="Gardens"
+        component={Gardens}
+      />
+      <Stack.Screen
+        name="CreateGarden"
+        component={CreateGarden} />
+
+      <Stack.Screen
+        name="DrawPoligon"
+        component={DrawPoligon} />
+    </Stack.Navigator>
+  )
     return (
       <Stack.Navigator
         screenOptions={{
@@ -164,6 +194,28 @@ const AddPlantNoteStack = () => {
             <Stack.Screen name="SelectPlant" component={SelectPlant} />
         </Stack.Navigator>
     );
+const CameraStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="Camera" component={Camera} />
+      <Stack.Screen name="SelectPlant" component={SelectPlant} />
+    </Stack.Navigator>
+  );
+}
+
+const SettingsStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="Profile" component={Profile} />
+    </Stack.Navigator>
+  );
 }
 
 
