@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { View, Image, Dimensions } from "react-native";
-import AddPlantNote from "../pages/AddPlantNote";
+import AddPlantNote from '../pages/AddPlantNote';
 import Map from "../pages/Map";
 import Gardens from "../pages/Gardens";
 import Profile from "../pages/Profile";
@@ -10,9 +10,8 @@ import styles from "../styles/Style";
 import CreateGarden from "../pages/CreateGarden"
 import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import DrawPoligon from "../pages/DrawPoligon";
+import DrawPolygon from "../pages/DrawPolygon";
 import Settings from "../pages/Settings";
-import GardenArea from "../pages/GardenArea";
 
 
 const { width, height } = Dimensions.get("window")
@@ -36,20 +35,10 @@ const BottomNavigation = () => {
           tabBarHideOnKeyboard: true,
 
         }}>
-                <Tab.Screen
-                    name="AddPlantNoteStack"
-                    component={AddPlantNoteStack}
-                    options={{
-                        tabBarIcon: ({ focused }) => (
-                            <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <Image
-                                    source={focused ? require("../images/icons/focused_camera.png") : require("../images/icons/camera.png")}
-                                    resizeMode="contain"
-                                    style={styles.bottomNavigationİcons}
 
         <Tab.Screen
-          name="CameraStack"
-          component={CameraStack}
+          name="AddPlantNoteStack"
+          component={AddPlantNoteStack}
           options={{
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -168,20 +157,10 @@ const GardensStack = () => {
         component={CreateGarden} />
 
       <Stack.Screen
-        name="DrawPoligon"
-        component={DrawPoligon} />
+        name="DrawPolygon"
+        component={DrawPolygon} />
     </Stack.Navigator>
   )
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}>
-        <Stack.Screen name="Gardens" component={Gardens} />
-        <Stack.Screen name="CreateGarden" component={CreateGarden} />
-        <Stack.Screen name="GardenArea" component={GardenArea} />
-      </Stack.Navigator>
-    );
 }
 
 const AddPlantNoteStack = () => {
@@ -194,16 +173,6 @@ const AddPlantNoteStack = () => {
             <Stack.Screen name="SelectPlant" component={SelectPlant} />
         </Stack.Navigator>
     );
-const CameraStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name="Camera" component={Camera} />
-      <Stack.Screen name="SelectPlant" component={SelectPlant} />
-    </Stack.Navigator>
-  );
 }
 
 const SettingsStack = () => {
@@ -220,5 +189,3 @@ const SettingsStack = () => {
 
 
 export default BottomNavigation
-
-
