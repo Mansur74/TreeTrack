@@ -5,16 +5,43 @@ import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import React, { useState, useEffect } from 'react';
 import {useRoute} from '@react-navigation/native';
+import storage from "@react-native-firebase/storage"
+import firestore from '@react-native-firebase/firestore';
 
+
+const getPlantOfGarden = async (garden_id) => {
+  const querySnapshot = await firestore()
+    .collection('plants')
+    .where('garden_id', '==', garden_id)
+    .get();
+  const plantList = querySnapshot.docs.map(doc => {
+    const data = doc.data();
+    data.created_at = String(data.created_at.toDate());
+    return data;
+  });
+  return plantList;
+};
 const SelectPlant = () => {
   const route = useRoute();
 
   const selectedGarden = route.params.selectedGarden;
+  const [plants, setPlantList] = useState([]);
+  // get plants of selected garden
+  useEffect(() => {
+    const fetchData = async () => {
+      setPlantList(await getPlantOfGarden(selectedGarden.id));
+    };
+    fetchData();
+  }, []);
+  
+  /*plants.forEach(element => {
+    console.log("=== plant: ", element)
+  });*/
   const plantNote = route.params.plantNote;
-  const imagePath = route.params.imagePath;
+  const image = route.params.imagePath;
 
   const polygon = selectedGarden.polygon;
-  const plants = selectedGarden.plants;
+
   let initialMessage = 'You did not select any plant';
   if (plants.length == 0) {
     initialMessage = 'This garden has no plant';
@@ -54,15 +81,51 @@ const SelectPlant = () => {
       });
     });
   }, []);
-  console.log('Current position: ', currentPosition);
-  // TODO: API post request
-  const saveNote = () => {
+  //console.log('Current position: ', currentPosition);
+  
+  const uploadImage = async(imageUri, folderName) =>{
+    const imageRef = storage().ref(`${folderName}/${imageUri.split('/').pop()}`,
+    );
+    const response = await fetch(imageUri);
+    console.log('\nuploadImage response: ', response.status, ' ', response);
+    const blob = await response.blob();
+
+    await imageRef.put(blob);
+  }
+
+  const getImageUrl = async (folderName, imageName) => {
+    const imageRef = storage().ref(`${folderName}/${imageName}`);
+    return await imageRef.getDownloadURL();
+  }
+
+
+  const saveNote = async () => {
     if (!selectedPlant) {
       ToastAndroid.show(
         'You must select a plant to save note.',
         ToastAndroid.LONG,
       );
     } else {
+      let imageUrl = null
+      if(image != null && image.path != null){
+        const imageName = image.path.split('/').pop();
+        await uploadImage(image.path, 'plants');
+        console.log('Image is saved');
+        imageUrl = await getImageUrl('plants', imageName);
+        console.log('URL of saved image: ', imageUrl);
+      }
+      else{
+        console.log("no image selected")
+      }
+      const newPlantNote = {
+        created_at:  new Date(),
+        plant_id: selectedPlant.id,
+        note: plantNote,
+        image_url: imageUrl
+      }
+      const newPlantNoteRf = await firestore().collection('plant_notes').add(newPlantNote);
+      await newPlantNoteRf.update({id: newPlantNoteRf.id});
+
       ToastAndroid.show(
         'Plant note for ' + selectedPlant.name + ' is saved.',
         ToastAndroid.LONG,
