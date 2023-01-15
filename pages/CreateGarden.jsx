@@ -7,22 +7,24 @@ import {
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import PhotoPick from '../layouts/ImagePicker';
-import {useRoute} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore'
+import storage from "@react-native-firebase/storage"
 
 // fake data - TODO: retrieve from API
 const gardenTypeList = [
-  {id: 1, name: 'Farm'},
-  {id: 2, name: 'Container Garden'},
-  {id: 3, name: 'Ferennial garden'},
-  {id: 4, name: 'Rose garden'},
-  {id: 5, name: 'Water garden'},
+  { id: 1, name: 'Farm' },
+  { id: 2, name: 'Container Garden' },
+  { id: 3, name: 'Ferennial garden' },
+  { id: 4, name: 'Rose garden' },
+  { id: 5, name: 'Water garden' },
 ];
-const CreateGarden = ({navigation}) => {
+const CreateGarden = ({ navigation }) => {
   const route = useRoute(); // polygon coordinates will come from GardenArea page
   const polygon = route.params ? route.params.coordinates : [];
   const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
@@ -37,26 +39,62 @@ const CreateGarden = ({navigation}) => {
     }
   };
 
-  // TODO: API post request
-  const saveGarden = () => {
-    const gardenObj = {
-      gardenName,
-      gardenType: pickerValue,
-      gardenImage: imagePath,
-      gardenNote,
-      userIds: [1],
-      polygon,
+  // add garden
+  const addGarden = async () => {
+
+    let imageUrl
+    if (imagePath != null) {
+      const imageName = imagePath.split('/').pop();
+      await uploadImage(imagePath, 'gardens');
+      console.log('Image is saved');
+      imageUrl = await getImageUrl('gardens', imageName);
+      console.log('URL of saved image: ', imageUrl);
+    }
+    const gardenData = {
+      name: gardenName,
+      created_at: new Date(),
+      polygon: polygon,
+      image_url: imageUrl
     };
-    console.log('Saved garden: ', gardenObj);
-    ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
-    navigation.navigate('Gardens');
+
+    const ref = firestore().collection('gardens').doc()
+    await ref
+      .set({
+        id: ref.id,
+        polygon: gardenData.polygon.map(
+          coordinate => new firestore.GeoPoint(coordinate.latitude, coordinate.longitude),
+        ),
+        ...gardenData,
+      })
+      .then(() => {
+        ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
+        navigation.navigate('Gardens');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
+
+  const uploadImage = async (imageUri, folderName) => {
+    const imageRef = storage().ref(`${folderName}/${imageUri.split('/').pop()}`,
+    );
+    const response = await fetch(imageUri);
+    console.log('\nuploadImage response: ', response.status, ' ', response);
+    const blob = await response.blob();
+
+    await imageRef.put(blob);
+  }
+
+  const getImageUrl = async (folderName, imageName) => {
+    const imageRef = storage().ref(`${folderName}/${imageName}`);
+    return await imageRef.getDownloadURL();
+  }
 
   return (
     <LinearGradient
       colors={['#D1A96DE5', '#DB966FE5']}
-      style={{height: '100%'}}>
-      <View style={{padding: 20, flex: 1, marginBottom: 110}}>
+      style={{ height: '100%' }}>
+      <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
         <Text style={styles.text}>add a new garden</Text>
 
         <ScrollView>
@@ -91,7 +129,7 @@ const CreateGarden = ({navigation}) => {
               <Picker
                 dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
                 dropdownIconColor={'#21212110'}
-                style={{color: '#212121'}}
+                style={{ color: '#212121' }}
                 selectedValue={pickerValue}
                 onValueChange={itemValue => {
                   setPickerValue(itemValue);
@@ -100,7 +138,7 @@ const CreateGarden = ({navigation}) => {
                   <Picker.Item
                     key={gardenType.id}
                     label={gardenType.name}
-                    value={gardenType.id}
+                    value={gardenType.name}
                     color="#fff"
                   />
                 ))}
@@ -108,7 +146,7 @@ const CreateGarden = ({navigation}) => {
             </View>
 
             <Text style={styles.t4}>Add location of your garden</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity
                 style={{
                   ...styles.button_left,
@@ -126,7 +164,7 @@ const CreateGarden = ({navigation}) => {
                     width: 25,
                     height: 25,
                   }}></Image>
-                <Text style={{...styles.bt1, color: '#212121', marginLeft: 5}}>
+                <Text style={{ ...styles.bt1, color: '#212121', marginLeft: 5 }}>
                   Open Map
                 </Text>
               </TouchableOpacity>
@@ -154,9 +192,9 @@ const CreateGarden = ({navigation}) => {
             />
 
             <TouchableOpacity
-              style={{...styles.button_right, width: 125}}
-              onPress={saveGarden}>
-              <Text style={{...styles.bt1}}>
+              style={{ ...styles.button_right, width: 125 }}
+              onPress={addGarden}>
+              <Text style={{ ...styles.bt1 }}>
                 Save
               </Text>
             </TouchableOpacity>

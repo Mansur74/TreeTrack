@@ -1,27 +1,41 @@
-import { View, Text, Image } from "react-native"
+import { View, Text, Image, ToastAndroid } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 import { TouchableOpacity } from "react-native";
 import EmptyGardens from "../layouts/EmptyGardens";
 import FilledGardens from "../layouts/FilledGardens";
-import database from '@react-native-firebase/database';
 import { useEffect, useState } from "react";
+import firestore from '@react-native-firebase/firestore';
+
+// get gardens
+const getGardens = async () => {
+  gList = []
+  await firestore()
+    .collection("gardens")
+    .get()
+    .then(querySnapshot => {
+      gList = querySnapshot.docs.map(doc => doc.data())
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  return gList
+}
 
 const Gardens = ({ navigation }) => {
   const [gardens, setGardens] = useState([])
+
   useEffect(() => {
-    database()
-    .ref('/gardens/garden1')
-    .on('value', snapshot => {
-      console.log(snapshot.val());
-      setGardens([snapshot.val()])
-    });
+    const fetchData = async () => {
+      setGardens(await getGardens());
+    };
+    fetchData();
   }, []);
 
   return (
     gardens.length == 0
       ? <EmptyGardens navigation={navigation} />
-      : <FilledGardens navigation={navigation} gardens={gardens} />
+      : <FilledGardens navigation={navigation} gardens={gardens}/>
   )
 }
 
