@@ -42,7 +42,7 @@ const CreateGarden = ({ navigation }) => {
   // add garden
   const addGarden = async () => {
 
-    let imageUrl
+    let imageUrl = null
     if (imagePath != null) {
       const imageName = imagePath.split('/').pop();
       await uploadImage(imagePath, 'gardens');
