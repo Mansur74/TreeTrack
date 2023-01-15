@@ -24,13 +24,14 @@ const gardenTypeList = [
   { id: 4, name: 'Rose garden' },
   { id: 5, name: 'Water garden' },
 ];
-const CreateGarden = ({ navigation }) => {
-  const route = useRoute(); // polygon coordinates will come from GardenArea page
-  const polygon = route.params ? route.params.coordinates : [];
+const CreateGarden = ({ route, navigation }) => {
+  const onAdd = route.params && route.params.onAdd ? route.params.onAdd : () => {};
+  const polygon = route.params && route.params.coordinates ? route.params.coordinates : [];
   const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
   const [gardenName, setGardenName] = useState(null);
   const [gardenNote, setGardenNote] = useState(null);
+  
   const onSelectImage = image => {
     if (!image) {
       setSelectedImage(null);
@@ -67,6 +68,7 @@ const CreateGarden = ({ navigation }) => {
         ...gardenData,
       })
       .then(() => {
+        onAdd();
         ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
         navigation.navigate('Gardens');
       })

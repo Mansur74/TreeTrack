@@ -25,9 +25,10 @@ const getGardens = async () => {
 const Gardens = ({ navigation }) => {
   const [gardens, setGardens] = useState([])
 
-  const deleteGarden = (gardenId) => {
-    setGardens(gardens.filter(garden => garden.id !== gardenId))
-  }
+  const updateGardens = async () => {
+    const data = await getGardens();
+    setGardens(data);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +41,7 @@ const Gardens = ({ navigation }) => {
   return (
     gardens.length == 0
       ? <EmptyGardens navigation={navigation} />
-      : <FilledGardens navigation={navigation} gardens={gardens} onDelete={deleteGarden}/>
+      : <FilledGardens navigation={navigation} gardens={gardens} onAdd={updateGardens} onDelete={updateGardens}/>
   )
 }
 
