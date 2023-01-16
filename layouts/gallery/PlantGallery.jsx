@@ -1,0 +1,178 @@
+import {ScrollView, View, Text, Image, TouchableOpacity, Modal} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import firestore from '@react-native-firebase/firestore';
+import React, {useState, useEffect} from 'react';
+
+const PlantGallery = () => {
+  const [plantNoteList, setNoteList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      let querySnapshot = await firestore().collection('plants').get();
+      const plants = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        data.created_at = String(data.created_at.toDate());
+        return data;
+      });
+
+      let querySnapshot2 = await firestore().collection('plant_notes').get();
+      const garden_notes = querySnapshot2.docs.map(doc => {
+        const data = doc.data();
+        data.created_at = String(data.created_at.toDate());
+        return data;
+      });
+
+      let notesWithPlantName = [];
+      garden_notes.forEach(note => {
+        let plant = plants.find(p => p.id === note.plant_id);
+        if (plant) {
+          note.plant_name = plant.name;
+          notesWithPlantName.push(note);
+        }
+      });
+      setNoteList(notesWithPlantName);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, []);
+  
+  const displayNote = (item) => {
+    console.log("Plant note: ", item)
+    // TODO: show Modal
+  }
+  
+  if (isLoading) {
+    return (
+      <View>
+        {/* order options */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 5,
+            paddingVertical: 10,
+          }}>
+          <View
+            style={{
+              width: '49%',
+              height: 45,
+              borderRadius: 15,
+              backgroundColor: '#fff',
+              justifyContent: 'center',
+            }}>
+            <Picker style={{color: '#212121'}} selectedValue={'All Gardens'}>
+              <Picker.Item
+                key={'All Plants'}
+                label={'All Plants'}
+                value={'All Plants'}
+              />
+            </Picker>
+          </View>
+
+          <View
+            style={{
+              width: '49%',
+              height: 45,
+              borderRadius: 15,
+              backgroundColor: '#fff',
+              justifyContent: 'center',
+            }}>
+            <Picker
+              style={{color: '#212121'}}
+              selectedValue={'Newest to Oldest'}>
+              <Picker.Item
+                key={'Newest to Oldest'}
+                label={'Newest to Oldest'}
+                value={'Newest to Oldest'}
+              />
+            </Picker>
+          </View>
+        </View>
+        <Text style={{color: "#efefef", padding: 10}}>Loading...</Text>
+      </View>
+    );
+  }
+  return (
+    <View>
+      {/* order options */}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          paddingHorizontal: 5,
+          paddingVertical: 10,
+        }}>
+        <View
+          style={{
+            width: '49%',
+            height: 45,
+            borderRadius: 15,
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+          }}>
+          <Picker style={{color: '#212121'}} selectedValue={'All Gardens'}>
+            <Picker.Item
+              key={'All Plants'}
+              label={'All Plants'}
+              value={'All Plants'}
+            />
+          </Picker>
+        </View>
+
+        <View
+          style={{
+            width: '49%',
+            height: 45,
+            borderRadius: 15,
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+          }}>
+          <Picker style={{color: '#212121'}} selectedValue={'Newest to Oldest'}>
+            <Picker.Item
+              key={'Newest to Oldest'}
+              label={'Newest to Oldest'}
+              value={'Newest to Oldest'}
+            />
+          </Picker>
+        </View>
+      </View>
+      {/* plant note section */}
+      <ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignContent: 'flex-start',
+            marginBottom: 150,
+          }}>
+          {plantNoteList.map(item => (
+            <TouchableOpacity
+              style={{
+                width: '47%',
+                alignItems: 'center',
+                backgroundColor: '#efefef70',
+                padding: 5,
+                margin: 5,
+                borderRadius: 5,
+              }}
+              key={item.id}
+              onPress={() => {
+                displayNote(item);
+              }}>
+              <Image
+                style={{width: 150, height: 150}}
+                source={
+                  item.image_url == null
+                    ? require('../../images/default_plant.png')
+                    : {uri: item.image_url}
+                }></Image>
+              <Text style={{color: '#212121'}}>{item.plant_name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+export default PlantGallery;

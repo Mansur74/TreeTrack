@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
-import GardenGallery from './GardenGallery';
-import PlantGallery from "./PlantGallery";
+import GardenGallery from '../layouts/gallery/GardenGallery';
+import PlantGallery from '../layouts/gallery/PlantGallery';
 import React, { useState, useEffect} from 'react';
 
 const Galleries = () => {

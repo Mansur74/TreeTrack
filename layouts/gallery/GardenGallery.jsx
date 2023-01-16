@@ -1,11 +1,10 @@
-import {ScrollView, View, Text, Image} from 'react-native';
+import {ScrollView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
 import React, {useState, useEffect} from 'react';
 
 
 const GardenGallery = () => {
-  const [gardenList, setGList] = useState([]);
   const [gardenNoteList, setNoteGList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
@@ -40,14 +39,20 @@ const GardenGallery = () => {
     
   }, []);
 
+  const displayNote = item => {
+    console.log("Garden note: ", item);
+    // TODO: show Modal
+  };
 if (isLoading) {
   return (
     <View>
+      {/* order options */}
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          padding: 20,
+          paddingHorizontal: 5,
+          paddingVertical: 10,
         }}>
         <View
           style={{
@@ -59,9 +64,9 @@ if (isLoading) {
           }}>
           <Picker style={{color: '#212121'}} selectedValue={'All Gardens'}>
             <Picker.Item
-              key={'All Gardens'}
-              label={'All Gardens'}
-              value={'All Gardens'}
+              key={'All Plants'}
+              label={'All Plants'}
+              value={'All Plants'}
             />
           </Picker>
         </View>
@@ -83,7 +88,7 @@ if (isLoading) {
           </Picker>
         </View>
       </View>
-      <Text>Loading...</Text>
+      <Text style={{color: '#efefef', padding: 10}}>Loading...</Text>
     </View>
   );
 }
@@ -93,7 +98,8 @@ if (isLoading) {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          padding: 20,
+          paddingHorizontal: 5,
+          paddingVertical: 10
         }}>
         <View
           style={{
@@ -129,17 +135,40 @@ if (isLoading) {
           </Picker>
         </View>
       </View>
+      {/* plant note section */}
       <ScrollView>
-        {gardenNoteList.map(n => (
-          <View style= {{alignItems: 'center'}}>
-            <Image
-              style={{width: 150, height: 150}}
-              source={{
-                uri: n.image_url,
-              }}></Image>
-            <Text>{n.garden_name}</Text>
-          </View>
-        ))}
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignContent: 'flex-start',
+            marginBottom: 150,
+          }}>
+          {gardenNoteList.map(item => (
+            <TouchableOpacity
+              style={{
+                width: '47%',
+                alignItems: 'center',
+                backgroundColor: '#efefef70',
+                padding: 5,
+                margin: 5,
+                borderRadius: 5,
+              }}
+              key={item.id}
+              onPress={() => {
+                displayNote(item);
+              }}>
+              <Image
+                style={{width: 150, height: 150}}
+                source={
+                  item.image_url == null
+                    ? require('../../images/default_plant.png')
+                    : {uri: item.image_url}
+                }></Image>
+              <Text style={{color: '#212121'}}>{item.garden_name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
