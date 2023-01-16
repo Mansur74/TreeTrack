@@ -21,55 +21,15 @@ const getPlantOfGarden = async (garden_id) => {
   });
   return plantList;
 };
-const SelectPlant = () => {
-  const route = useRoute();
-
-  const selectedGarden = route.params.selectedGarden;
-  const [plants, setPlantList] = useState([]);
-  // get plants of selected garden
-  useEffect(() => {
-    const fetchData = async () => {
-      setPlantList(await getPlantOfGarden(selectedGarden.id));
-    };
-    fetchData();
-  }, []);
-  
-  /*plants.forEach(element => {
-    console.log("=== plant: ", element)
-  });*/
-  const plantNote = route.params.plantNote;
-  const image = route.params.imagePath;
-
-  const polygon = selectedGarden.polygon;
-
-  let initialMessage = 'You did not select any plant';
-  if (plants.length == 0) {
-    initialMessage = 'This garden has no plant';
-  }
-  const [selectedPlant, setSelectedPlant] = useState(null);
-
-  const {width, height} = Dimensions.get('window');
-  const aspectRatio = width / height;
-
-  const minLatitude = Math.min(...polygon.map(p => p.latitude));
-  const maxLatitude = Math.max(...polygon.map(p => p.latitude));
-  const minLongitude = Math.min(...polygon.map(p => p.longitude));
-  const maxLongitude = Math.max(...polygon.map(p => p.longitude));
-
-  const latitude = (minLatitude + maxLatitude) / 2;
-  const longitude = (minLongitude + maxLongitude) / 2;
-  const latitudeDelta = maxLatitude - minLatitude;
-  const longitudeDelta = (maxLongitude - minLongitude) * aspectRatio;
-
-  const region = {latitude, longitude, latitudeDelta, longitudeDelta};
-
+const SelectPlant = ({navigation}) => {
+  // get current position
   const [currentPosition, setPosition] = useState({
     latitude: 10,
     longitude: 10,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
-
+  // current position updated when user moves
   useEffect(() => {
     Geolocation.getCurrentPosition(pos => {
       const crd = pos.coords;
@@ -81,23 +41,67 @@ const SelectPlant = () => {
       });
     });
   }, []);
-  //console.log('Current position: ', currentPosition);
-  
-  const uploadImage = async(imageUri, folderName) =>{
-    const imageRef = storage().ref(`${folderName}/${imageUri.split('/').pop()}`,
+  console.log('============ Current position: ', currentPosition);
+  const route = useRoute();
+
+  const selectedGarden = route.params.selectedGarden;
+  const [plants, setPlantList] = useState([]);
+  // get plants of selected garden
+  useEffect(() => {
+    const fetchData = async () => {
+      setPlantList(await getPlantOfGarden(selectedGarden.id));
+    };
+    fetchData();
+  }, []);
+
+  /*plants.forEach(element => {
+    console.log("=== plant: ", element)
+  });*/
+  const plantNote = route.params.plantNote;
+  const image = route.params.imagePath;
+
+  const polygon = selectedGarden.polygon;
+  let region = currentPosition;
+  if (polygon.length > 2) {
+    const {width, height} = Dimensions.get('window');
+    const aspectRatio = width / height;
+
+    const minLatitude = Math.min(...polygon.map(p => p.latitude));
+    const maxLatitude = Math.max(...polygon.map(p => p.latitude));
+    const minLongitude = Math.min(...polygon.map(p => p.longitude));
+    const maxLongitude = Math.max(...polygon.map(p => p.longitude));
+
+    const latitude = (minLatitude + maxLatitude) / 2;
+    const longitude = (minLongitude + maxLongitude) / 2;
+    const latitudeDelta = maxLatitude - minLatitude;
+    const longitudeDelta = (maxLongitude - minLongitude) * aspectRatio;
+
+    region = {latitude, longitude, latitudeDelta, longitudeDelta};
+  }
+  else{
+    ToastAndroid.show("This garden's area is not declared.", ToastAndroid.SHORT)
+  }
+  let initialMessage = 'You did not select any plant';
+  if (plants.length == 0) {
+    initialMessage = 'This garden has no plant';
+  }
+  const [selectedPlant, setSelectedPlant] = useState(null);
+
+  const uploadImage = async (imageUri, folderName) => {
+    const imageRef = storage().ref(
+      `${folderName}/${imageUri.split('/').pop()}`,
     );
     const response = await fetch(imageUri);
     console.log('\nuploadImage response: ', response.status, ' ', response);
     const blob = await response.blob();
 
     await imageRef.put(blob);
-  }
+  };
 
   const getImageUrl = async (folderName, imageName) => {
     const imageRef = storage().ref(`${folderName}/${imageName}`);
     return await imageRef.getDownloadURL();
-  }
-
+  };
 
   const saveNote = async () => {
     if (!selectedPlant) {
@@ -106,30 +110,32 @@ const SelectPlant = () => {
         ToastAndroid.LONG,
       );
     } else {
-      let imageUrl = null
-      if(image != null && image.path != null){
+      // upload image to storage and get URL
+      let imageUrl = null;
+      if (image != null && image.path != null) {
         const imageName = image.path.split('/').pop();
         await uploadImage(image.path, 'plants');
         console.log('Image is saved');
         imageUrl = await getImageUrl('plants', imageName);
         console.log('URL of saved image: ', imageUrl);
       }
-      else{
-        console.log("no image selected")
-      }
+      // construct new plant note
       const newPlantNote = {
-        created_at:  new Date(),
+        created_at: new Date(),
         plant_id: selectedPlant.id,
         note: plantNote,
-        image_url: imageUrl
-      }
-      const newPlantNoteRf = await firestore().collection('plant_notes').add(newPlantNote);
+        image_url: imageUrl,
+      };
+      const newPlantNoteRf = await firestore()
+        .collection('plant_notes')
+        .add(newPlantNote);
       await newPlantNoteRf.update({id: newPlantNoteRf.id});
 
       ToastAndroid.show(
         'Plant note for ' + selectedPlant.name + ' is saved.',
         ToastAndroid.LONG,
       );
+      navigation.navigate('AddNote');
     }
   };
 
@@ -153,11 +159,14 @@ const SelectPlant = () => {
           style={{width: '100%', height: '45%', marginBottom: 15}}
           showsUserLocation={true}
           initialRegion={region}>
-          <Polygon
-            coordinates={polygon}
-            strokeWidth={2}
-            fillColor="rgba(167, 255, 200, 0.31)"
-          />
+          {polygon.length > 2 && (
+            <Polygon
+              coordinates={polygon}
+              strokeWidth={2}
+              fillColor="rgba(167, 255, 200, 0.31)"
+            />
+          )}
+
           {plants.map(plant => (
             <Marker
               key={plant.id}
@@ -173,19 +182,9 @@ const SelectPlant = () => {
               onPress={() => {
                 setSelectedPlant(plant);
               }}
-              style={{alignItems: 'center', justifyContent: 'center'}}>
-              <View style={{flexDirection: 'column', alignItems: 'center'}}>
-                <Text
-                  style={{
-                    color: '#212121',
-                    fontWeight: '400',
-                    fontSize: 12,
-                    textAlign: 'center',
-                    marginTop: 20,
-                  }}>
-                  {plant.name}
-                </Text>
-              </View>
+              style={{alignItems: 'center', justifyContent: 'center'}}
+              title={plant.name}>
+              
             </Marker>
           ))}
         </MapView>

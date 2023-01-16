@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { View, Image, Dimensions } from "react-native";
-import AddPlantNote from '../pages/AddPlantNote';
+import AddNote from '../pages/AddNote';
 import Map from "../pages/Map";
 import Gardens from "../pages/Gardens";
 import Profile from "../pages/Profile";
@@ -37,8 +37,8 @@ const BottomNavigation = () => {
         }}>
 
         <Tab.Screen
-          name="AddPlantNoteStack"
-          component={AddPlantNoteStack}
+          name="AddNoteStack"
+          component={AddNoteStack}
           options={{
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -63,7 +63,7 @@ const BottomNavigation = () => {
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
-                  source={require("../images/icons/location.png")}
+                  source={focused ? require("../images/icons/focused_location.png") : require("../images/icons/location.png")}
                   resizeMode="contain"
                   style={styles.bottomNavigationİcons}
 
@@ -84,7 +84,7 @@ const BottomNavigation = () => {
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
-                  source={require("../images/icons/plant.png")}
+                  source={focused ? require("../images/icons/focused_plant.png") : require("../images/icons/plant.png")}
                   resizeMode="contain"
                   style={styles.bottomNavigationİcons}
 
@@ -104,7 +104,7 @@ const BottomNavigation = () => {
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
-                  source={require("../images/icons/image.png")}
+                  source={focused ? require("../images/icons/focused_gallery.png") : require("../images/icons/gallery.png")}
                   resizeMode="contain"
                   style={styles.bottomNavigationİcons}
 
@@ -124,7 +124,7 @@ const BottomNavigation = () => {
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
-                  source={require("../images/icons/ic_settings.png")}
+                  source={focused ? require("../images/icons/focused_settings.png") : require("../images/icons/settings.png")}
                   resizeMode="contain"
                   style={styles.bottomNavigationİcons}
 
@@ -163,13 +163,13 @@ const GardensStack = () => {
   )
 }
 
-const AddPlantNoteStack = () => {
+const AddNoteStack = () => {
     return (
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
             }}>
-            <Stack.Screen name="AddPlantNote" component={AddPlantNote} />
+            <Stack.Screen name="AddNote" component={AddNote} />
             <Stack.Screen name="SelectPlant" component={SelectPlant} />
         </Stack.Navigator>
     );

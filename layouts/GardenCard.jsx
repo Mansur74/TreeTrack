@@ -18,39 +18,38 @@ const deleteGarden = async (gardenId, onDelete) => {
 }
 
 const GardenCard = ({ garden, onDelete }) => {
+  const garden_image =
+    ! garden.image_url
+      ? 'https://cdn-icons-png.flaticon.com/512/3039/3039008.png'
+      : garden.image_url;
   return (
     <View
       style={{
-        flexDirection: "row",
-        justifyContent: "center",
-        marginBottom: 10
-      }}
-    >
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 10,
+      }}>
       <View
         style={{
-          width: "75%",
-          backgroundColor: "#FFF1DD",
+          width: '75%',
+          backgroundColor: '#FFF1DD',
           padding: 10,
-          borderRadius: 10
+          borderRadius: 10,
         }}>
-
         <Image
           style={{
-            width: "100%",
+            width: '100%',
             height: 200,
-            marginBottom: 10
+            marginBottom: 10,
           }}
           source={{
-            uri: garden.image_url
-          }
-          }>
-
-        </Image>
+            uri: garden_image,
+          }}></Image>
 
         <View
           style={{ flexDirection: "row", justifyContent: "space-between" }}>
 
-          <Text>
+          <Text style={{color: "#212121"}}>
             {garden.name}
           </Text>
 
@@ -58,41 +57,54 @@ const GardenCard = ({ garden, onDelete }) => {
           <Menu>
             <MenuTrigger style={{}}>
               <Image
-                style={{
-                }}
+                style={{width: 22, height: 22}}
                 source={require('../images/icons/ic_options.png')}>
 
               </Image>
             </MenuTrigger>
-            <MenuOptions optionsContainerStyle={{ width: 150, backgroundColor: "#FFF1DD", borderRadius: 5 }}>
-              <View style={{ borderColor: "#888888", borderWidth: 1 }}>
+            <MenuOptions
+              optionsContainerStyle={{
+                width: 150,
+                backgroundColor: '#FFF1DD',
+                borderRadius: 5,
+              }}>
+              <View style={{borderColor: '#888888', borderWidth: 1}}>
                 <MenuOption onSelect={() => alert(`Edit`)}>
-                  <Text style={{ textAlign: "center" }}>Edit</Text>
+                  <Text style={{textAlign: 'center', color: '#212121'}}>
+                    Edit
+                  </Text>
                 </MenuOption>
-                <View style={{ backgroundColor: "#888888", height: 1, width: "100%" }} />
+                <View
+                  style={{backgroundColor: '#888888', height: 1, width: '100%'}}
+                />
                 <MenuOption onSelect={() => alert(`Rename`)}>
-                  <Text style={{ textAlign: "center" }}>Rename</Text>
+                  <Text style={{textAlign: 'center', color: '#212121'}}>
+                    Rename
+                  </Text>
                 </MenuOption>
-                <View style={{ backgroundColor: "#888888", height: 1, width: "100%" }} />
+                <View
+                  style={{backgroundColor: '#888888', height: 1, width: '100%'}}
+                />
                 <MenuOption onSelect={() => alert(`Share`)}>
-                  <Text style={{ textAlign: "center" }}>Share</Text>
+                  <Text style={{textAlign: 'center', color: '#212121'}}>
+                    Share
+                  </Text>
                 </MenuOption>
-                <View style={{ backgroundColor: "#888888", height: 1, width: "100%" }} />
+                <View
+                  style={{backgroundColor: '#888888', height: 1, width: '100%'}}
+                />
                 <MenuOption onSelect={() => deleteGarden(garden.id, onDelete)}>
-                  <Text style={{ textAlign: "center", color: 'red' }}>Delete</Text>
+                  <Text style={{textAlign: 'center', color: 'red'}}>
+                    Delete
+                  </Text>
                 </MenuOption>
               </View>
-
-
             </MenuOptions>
           </Menu>
-
-
         </View>
-
       </View>
     </View>
-  )
+  );
 }
 
 export default GardenCard
