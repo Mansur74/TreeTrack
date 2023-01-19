@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 20,
     paddingLeft: 20,
-    paddingRight: 20
+    paddingRight: 20,
   },
 
   bottomNavigationİcons: {
@@ -100,6 +100,36 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     elevation: 5,
     fontSize: 16,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+    backgroundColor: '#09A55530',
+  },
+  modalView: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonClose: {
+    backgroundColor: '#09A555',
+    borderRadius: 50,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    alignSelf: 'flex-end',
   },
 });
 

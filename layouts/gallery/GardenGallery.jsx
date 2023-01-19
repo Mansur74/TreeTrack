@@ -1,12 +1,28 @@
-import {ScrollView, View, Text, Image, TouchableOpacity} from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
 import React, {useState, useEffect} from 'react';
+import styles from "../../styles/Style";
 
 
+const formatDate = (date) => {
+  if (date != null && date.split(' ').length > 3)
+    return date.split(' ').slice(0, 4).join(' ');
+  return date  
+}
 const GardenGallery = () => {
   const [gardenNoteList, setNoteGList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pressedItem, setPressedItem] = useState({});
   useEffect(() => {
       const fetchData = async () => {
         setIsLoading(true)
@@ -40,8 +56,12 @@ const GardenGallery = () => {
   }, []);
 
   const displayNote = item => {
-    console.log("Garden note: ", item);
+    
+    setPressedItem(item)
+    setModalVisible(true)
+    console.log('Garden note: ', pressedItem);
     // TODO: show Modal
+
   };
 if (isLoading) {
   return (
@@ -99,7 +119,7 @@ if (isLoading) {
           flexDirection: 'row',
           justifyContent: 'space-between',
           paddingHorizontal: 5,
-          paddingVertical: 10
+          paddingVertical: 10,
         }}>
         <View
           style={{
@@ -149,7 +169,7 @@ if (isLoading) {
               style={{
                 width: '47%',
                 alignItems: 'center',
-                backgroundColor: '#efefef70',
+                backgroundColor: '#ffffff80',
                 padding: 5,
                 margin: 5,
                 borderRadius: 5,
@@ -162,15 +182,73 @@ if (isLoading) {
                 style={{width: 150, height: 150}}
                 source={
                   item.image_url == null
-                    ? require('../../images/default_plant.png')
+                    ? require('../../images/default_garden.jpg')
                     : {uri: item.image_url}
                 }></Image>
-              <Text style={{color: '#212121'}}>{item.garden_name}</Text>
+              <Text style={{color: '#212121', marginTop: 5}}>{item.garden_name}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+        {/* modal */}
+        <View style={styles.centeredView}>
+          <Modal
+            animationType="slide"
+            visible={modalVisible}
+            presentationStyle="fullScreen"
+            onRequestClose={() => {
+              console.log('Modal has been closed.');
+              setModalVisible(!modalVisible);
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <TouchableOpacity
+                  style={[styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={{color: '#fff', paddingTop: 2, fontWeight: '300'}}>x</Text>
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    color: 'black',
+                    fontSize: 18,
+                    fontWeight: '500',
+                    marginBottom: 10,
+                  }}>
+                  {pressedItem.garden_name}
+                </Text>
+                <Image
+                  style={{width: 250, height: 250, borderRadius: 8}}
+                  source={
+                    pressedItem.image_url == null
+                      ? require('../../images/default_garden.jpg')
+                      : {uri: pressedItem.image_url}
+                  }
+                />
+                <Text
+                  style={{
+                    color: '#212121',
+                    marginVertical: 15,
+                    textAlign: 'justify',
+                  }}>
+                  {pressedItem.note}
+                </Text>
+                <Text
+                  style={{
+                    color: '#21212190',
+                    alignSelf: 'flex-end',
+                    marginRight: 8,
+                    marginVertical: 15,
+                    fontStyle: 'italic',
+                  }}>
+                  {formatDate(pressedItem.created_at)}{' '}
+                </Text>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
     </View>
   );
+  
 };
+
 export default GardenGallery;
