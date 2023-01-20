@@ -59,7 +59,7 @@ const AddPlantNote = ({ navigation }) => {
           flex: 1,
           marginBottom: 150,
         }}>
-        <Text style={styles.text}>add plant note</Text>
+        <Text style={styles.text}>add note</Text>
         <View style={{flexDirection: 'row', justifyContent: 'center'}}>
           <View
             style={{

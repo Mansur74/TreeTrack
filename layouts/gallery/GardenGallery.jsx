@@ -33,7 +33,10 @@ const GardenGallery = () => {
            return data;
          });
         
-        let querySnapshot2 = await firestore().collection('garden_notes').get();
+        let querySnapshot2 = await firestore()
+          .collection('garden_notes')
+          .orderBy('created_at', 'desc')
+          .get();
         const garden_notes = querySnapshot2.docs.map(doc => {
           const data = doc.data();
           data.created_at = String(data.created_at.toDate());

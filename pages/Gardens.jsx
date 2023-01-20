@@ -11,12 +11,13 @@ import firestore from '@react-native-firebase/firestore';
 const getGardens = async () => {
   gList = []
   await firestore()
-    .collection("gardens")
+    .collection('gardens')
+    .orderBy('created_at', 'desc')
     .get()
     .then(querySnapshot => {
-      gList = querySnapshot.docs.map(doc => doc.data())
+      gList = querySnapshot.docs.map(doc => doc.data());
     })
-    .catch((error) => {
+    .catch(error => {
       console.error(error);
     });
   return gList
