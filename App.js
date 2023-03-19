@@ -19,9 +19,11 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import BottomNavigation from './navigations/BottomNavigation';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import SignUp from './pages/SignUp';
 
 const App = () => {
   return (
+    //<SignUp/>
     <NavigationContainer>
       <BottomNavigation/>
     </NavigationContainer>
