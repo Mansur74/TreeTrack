@@ -214,7 +214,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("C:\\Users\\Acer\\Documents\\RN\\TreeTrack\\tree_track.keystore")
+            storeFile file("tree_track.keystore")
             storePassword "treetrack06"
             keyAlias "tree_track"
             keyPassword "treetrack06"
