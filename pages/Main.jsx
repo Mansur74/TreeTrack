@@ -77,7 +77,7 @@ const Main = ({setIsInMain, setIsInSignIn}) => {
                 width: "75%",
                 elevation: 5
               }}>
-              <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "bold" }}>SIGN UP</Text>
+              <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "bold", color: "#36861C" }}>SIGN UP</Text>
             </TouchableOpacity>
 
             <Text

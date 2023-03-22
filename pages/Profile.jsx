@@ -88,13 +88,13 @@ const Profile = ({route}) => {
               paddingBottom: 10,
               borderRadius: 10
             }}>
-            <Text>{userName}</Text>
+            <Text style={{color: "black"}}>{userName}</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Last Name</Text>
+            <Text style={{color: "black"}}>Last Name</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Bio</Text>
+            <Text style={{color: "black"}}>Bio</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Home Garden</Text>
+            <Text style={{color: "black"}}>Home Garden</Text>
 
           </View>
 
@@ -108,13 +108,13 @@ const Profile = ({route}) => {
               paddingBottom: 10,
               borderRadius: 10
             }}>
-            <Text>Share Sprout Profile</Text>
+            <Text style={{color: "black"}}>Share Sprout Profile</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Connect Instagram</Text>
+            <Text style={{color: "black"}}>Connect Instagram</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Connect Twitter</Text>
+            <Text style={{color: "black"}}>Connect Twitter</Text>
             <View style={{ height: 1, backgroundColor: "gray", marginTop: 5, marginBottom: 5 }}></View>
-            <Text>Connect Pinterest</Text>
+            <Text style={{color: "black"}}>Connect Pinterest</Text>
 
           </View>
 
@@ -129,7 +129,7 @@ const Profile = ({route}) => {
               elevation: 5,
               justifyContent: "center"
             }}>
-            <Text style={{ fontSize: 16, textAlign: "center" }}>LOG OUT</Text>
+            <Text style={{ fontSize: 16, textAlign: "center", color: "black", fontWeight: "bold" }}>LOG OUT</Text>
           </TouchableOpacity>
 
         </View>

@@ -14,18 +14,35 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
     if (email != '' && password != '') {
       auth()
         .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          setIsSigned(true)
-          console.log('User signed in!');
-          ToastAndroid.show('User signed in succesfully.', ToastAndroid.SHORT);
+        .then((response) => {
+          const uid = response.user.uid
+          const usersRef = firestore().collection('users').doc(uid)
+          usersRef
+            .get()
+            .then(firestoreDocument => {
+              if (!firestoreDocument.exists) {
+                ToastAndroid.show('User does not exist!', ToastAndroid.SHORT);
+              }
+              usersRef.update({remember_auth: toggleCheckBox});
+              setIsSigned(true);
+              ToastAndroid.show(
+                'User signed in succesfully.',
+                ToastAndroid.SHORT,
+              );
+            })
+            .catch(error => {
+              console.error(error);
+              ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
+            });
+          
         })
         .catch(error => {
-          console.error(error);
-          ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
+          console.log(error);
+          ToastAndroid.show(error.message.split('] ')[1], ToastAndroid.SHORT);
         });
     }
     else if (email == '' || password == '') {
-      ToastAndroid.show('Email and password can not be empty!', ToastAndroid.SHORT);
+      ToastAndroid.show('Email and password cannot be empty!', ToastAndroid.SHORT);
     }
 
     else {
@@ -41,46 +58,46 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
 
     <View
       style={{
-        paddingTop: 40,
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingBottom: 20,
-        alignItems: "center"
+        paddingTop: '8%',
+        paddingLeft: '5%',
+        paddingRight: '5%',
+        paddingBottom: '5%',
+        alignItems: 'center',
+        height: '100%',
+        backgroundColor: '#efefef',
       }}>
-
       <Image
         resizeMode="contain"
         style={{
-          width: "75%"
+          width: '75%',
         }}
-        source={require("../images/tree_track.png")}>
+        source={require('../images/tree_track.png')}>
 
-      </Image>
+        </Image>
 
       <LinearGradient
-        colors={["#BAE9D1", "#36861C"]}
+        colors={['#BAE9D1', '#36861C']}
         style={{
-          width: "100%",
+          width: '100%',
           marginTop: 40,
           borderTopLeftRadius: 50,
           borderTopRightRadius: 50,
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 50,
           padding: 20,
-          paddingBottom: 150
+          paddingBottom: '20%'
 
-        }}
-      >
 
+        }}>
+        
         <View>
 
           <Text
             style={{
-              color: "white",
-              textAlign: "center",
+              color: 'white',
+              textAlign: 'center',
               fontSize: 20,
-              marginTop: 30,
-              marginBottom: 10
+              marginBottom: 10,
             }}>
             welcome :)
           </Text>
@@ -89,13 +106,15 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
             value={email}
             onChangeText={setEmail}
             placeholder="E-mail"
+            placeholderTextColor={'#21212160'}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black'
             }}
           />
 
@@ -103,44 +122,46 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
+            placeholderTextColor={'#21212160'}
             secureTextEntry={true}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black',
             }}
           />
 
           <Text
             style={{
-              color: "white",
-              textDecorationLine: "underline",
+              color: 'white',
+              textDecorationLine: 'underline',
               marginTop: 10,
-              marginLeft: 10
+              marginLeft: 10,
             }}>
             Forgot password?
           </Text>
 
           <View
             style={{
-              flexDirection: "row",
+              flexDirection: 'row',
               marginTop: 10,
-              alignItems: "center"
+              alignItems: 'center',
             }}>
 
             <CheckBox
               disabled={false}
               value={toggleCheckBox}
-              onValueChange={(newValue) => setToggleCheckBox(newValue)}
-              tintColors={{ true: "white" }}
+              onValueChange={newValue => setToggleCheckBox(newValue)}
+              tintColors={{true: 'white'}}
 
             />
             <Text
               style={{
-                color: "white",
+                color: 'white',
               }}>
               Remember me
             </Text>
@@ -152,47 +173,46 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
         </View>
 
 
-
+        
       </LinearGradient>
 
       <TouchableOpacity
         onPress={handleLogin}
         style={{
-          justifyContent: "center",
+          justifyContent: 'center',
           backgroundColor: '#36861C',
           borderRadius: 50,
           marginTop: 15,
           marginLeft: 50,
           marginRight: 50,
           height: 50,
-          width: "75%",
-          elevation: 5
+          width: '75%',
+          elevation: 5,
         }}>
-        <Text style={{ color: '#fff', fontSize: 16, textAlign: "center" }}>SIGN IN</Text>
+        <Text style={{color: '#fff', fontSize: 16, textAlign: 'center'}}>
+          SIGN IN
+        </Text>
       </TouchableOpacity>
 
       <View
         style={{
-          flexDirection: "row",
-          marginTop: 20
+          flexDirection: 'row',
+          marginTop: 10,
         }}>
-        <Text>
-          Don't you have an account?
-        </Text>
+        <Text style={{color: 'black'}}>Don't you have an account?</Text>
 
         <Text
           onPress={handleSignUp}
           style={{
-            textDecorationLine: "underline",
-            fontWeight: "bold"
+            textDecorationLine: 'underline',
+            fontWeight: 'bold',
+            color: '#36861C',
           }}>
           {'\t'}Sign up
         </Text>
       </View>
-
     </View>
-
-  )
+  );
 }
 
 

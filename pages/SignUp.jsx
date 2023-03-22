@@ -11,46 +11,39 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
+  const [rememberToggleCheckBox, setRememberToggleCheckBox] = useState(false);
 
 
   const handleSignUp = () => {
-    if (toggleCheckBox && email != '' & name != '' && password != '' & confirmPassword != '') {
+    if (toggleCheckBox && email != '' && name != '' && password != '') {
       if (password !== confirmPassword) {
         ToastAndroid.show('Passwords do not match!', ToastAndroid.SHORT);
         return;
       }
       auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // oturum açan kullanıcının durumunu dinle
-          auth().onAuthStateChanged((user) => {
-            if (user) {
-              console.log(user)
-              const { uid, email } = user;
-              const ref = firestore().collection('users').doc(uid)
-              ref.set({
-                "user_uid": uid,
-                "name": name,
-                "email": email,
-
-              })
-
-            }
-
-          });
+        .then((response) => {
+          const { uid, email } = response.user;
+          const ref = firestore().collection('users').doc(uid)
+          ref.set({
+            "user_uid": uid,
+            "name": name,
+            "email": email,
+            "remember_auth": rememberToggleCheckBox
+          })
           setIsSigned(true);
           console.log('User signed up!');
           ToastAndroid.show('User signed up!', ToastAndroid.SHORT);
 
-        })
+          })
         .catch((error) => {
           console.log(error);
-          ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
+          ToastAndroid.show(error.message.split('] ')[1], ToastAndroid.SHORT);
         });
     }
 
-    else if (email == '' || password == '' || name == '' || confirmPassword != '') {
-      ToastAndroid.show('Please fill the form corretcly!', ToastAndroid.SHORT);
+    else if (email == '' || password == '' || name == '') {
+      ToastAndroid.show('Please fill the form correctly!', ToastAndroid.SHORT);
     }
 
     else {
@@ -64,49 +57,42 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
   }
 
   return (
-
     <View
       style={{
-        paddingTop: 40,
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingBottom: 20,
-        alignItems: "center"
+        padding: '5%',
+        alignItems: 'center',
+        backgroundColor: '#efefef',
+        height: '100%',
       }}>
-
       <Image
         resizeMode="contain"
         style={{
-          width: "75%"
+          marginVertical: 10,
+          marginHorizontal: '5%',
+          alignItems: 'center',
+          width: '75%',
         }}
-        source={require("../images/tree_track.png")}>
-
-      </Image>
+        source={require('../images/tree_track.png')}></Image>
 
       <LinearGradient
-        colors={["#BAE9D1", "#36861C"]}
+        colors={['#BAE9D1', '#36861C']}
         style={{
-          width: "100%",
-          marginTop: 40,
+          width: '100%',
           borderTopLeftRadius: 50,
           borderTopRightRadius: 50,
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 50,
-          padding: 20,
-          paddingBottom: 150
-
-        }}
-      >
-
+          paddingHorizontal: 20,
+          paddingTop: '5%',
+          paddingBottom: '10%',
+        }}>
         <View>
-
           <Text
             style={{
-              color: "white",
-              textAlign: "center",
+              color: 'white',
+              textAlign: 'center',
               fontSize: 20,
-              marginTop: 30,
-              marginBottom: 10
+              marginBottom: '5%',
             }}>
             welcome :)
           </Text>
@@ -115,13 +101,15 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             value={name}
             onChangeText={setName}
             placeholder="Name"
+            placeholderTextColor={'#21212160'}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black',
             }}
           />
 
@@ -129,13 +117,15 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             value={email}
             onChangeText={setEmail}
             placeholder="E-mail"
+            placeholderTextColor={'#21212160'}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black',
             }}
           />
 
@@ -143,14 +133,16 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
+            placeholderTextColor={'#21212160'}
             secureTextEntry={true}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black',
             }}
           />
 
@@ -158,88 +150,103 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Confirm password"
+            placeholderTextColor={'#21212160'}
             secureTextEntry={true}
             style={{
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 50,
               paddingLeft: 20,
               paddingRight: 20,
               marginTop: 10,
-              elevation: 10
+              elevation: 10,
+              color: 'black',
             }}
           />
           <View
             style={{
-              flexDirection: "row",
+              flexDirection: 'row',
               marginTop: 10,
-              alignItems: "center"
+              alignItems: 'center',
             }}>
             <CheckBox
               disabled={false}
               value={toggleCheckBox}
-              onValueChange={(newValue) => setToggleCheckBox(newValue)}
-              tintColors={{ true: "white" }}
-
+              onValueChange={newValue => setToggleCheckBox(newValue)}
+              tintColors={{true: 'white'}}
             />
             <Text
               style={{
-                color: "white",
+                color: 'white',
               }}>
               I accept the
             </Text>
 
             <Text
               style={{
-                color: "white",
-                textDecorationLine: "underline"
+                color: 'white',
+                textDecorationLine: 'underline',
               }}>
               {'\t'}terms and conditions
             </Text>
           </View>
-
-
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <CheckBox
+              disabled={false}
+              value={rememberToggleCheckBox}
+              onValueChange={newValue => setRememberToggleCheckBox(newValue)}
+              tintColors={{true: 'white'}}
+            />
+            <Text
+              style={{
+                color: 'white',
+              }}>
+              Remember me
+            </Text>
+          </View>
         </View>
-
       </LinearGradient>
 
       <TouchableOpacity
         onPress={handleSignUp}
         style={{
-          justifyContent: "center",
+          justifyContent: 'center',
           backgroundColor: '#36861C',
           borderRadius: 50,
           marginTop: 15,
           marginLeft: 50,
           marginRight: 50,
           height: 50,
-          width: "75%",
-          elevation: 5
+          width: '75%',
+          elevation: 5,
         }}>
-        <Text style={{ color: '#fff', fontSize: 16, textAlign: "center" }}>SIGN UP</Text>
+        <Text style={{color: '#fff', fontSize: 16, textAlign: 'center'}}>
+          SIGN UP
+        </Text>
       </TouchableOpacity>
 
       <View
         style={{
-          flexDirection: "row",
-          marginTop: 20
+          flexDirection: 'row',
+          marginTop: 10,
         }}>
-        <Text>
-          Already have an account?
-        </Text>
+        <Text style={{color: 'black'}}>Already have an account?</Text>
 
         <Text
           onPress={handleSignIn}
           style={{
-            textDecorationLine: "underline",
-            fontWeight: "bold"
+            textDecorationLine: 'underline',
+            fontWeight: 'bold',
+            color: '#36861C',
           }}>
           {'\t'}Sign in
         </Text>
       </View>
-
     </View>
-
-  )
+  );
 }
 
 
