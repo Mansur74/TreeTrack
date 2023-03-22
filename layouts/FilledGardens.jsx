@@ -5,7 +5,7 @@ import { TouchableOpacity } from "react-native";
 import GardenCard from "./GardenCard";
 import { MenuProvider } from "react-native-popup-menu";
 
-const FilledGardens = ({ navigation, gardens, onDelete, onAdd }) => {
+const FilledGardens = ({ navigation, gardens, onUpdate }) => {
   return (
     <LinearGradient
       colors={["#FFFFFF", "#FFFFFF"]}
@@ -42,7 +42,7 @@ const FilledGardens = ({ navigation, gardens, onDelete, onAdd }) => {
               <MenuProvider>
                 {
                   gardens.map(garden =>
-                    <GardenCard key={garden.name} garden={garden} onDelete={onDelete}/>
+                    <GardenCard key={garden.name} garden={garden} onUpdate={onUpdate}/>
                   )
                 }
               </MenuProvider>
@@ -53,7 +53,7 @@ const FilledGardens = ({ navigation, gardens, onDelete, onAdd }) => {
             <TouchableOpacity
               style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130 }}
               onPress={() => {
-                navigation.navigate("CreateGarden", {onAdd: onAdd})
+                navigation.navigate("CreateGarden", {onUpdate: onUpdate})
               }}
             >
 

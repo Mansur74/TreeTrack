@@ -3,21 +3,21 @@ import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-
 import firestore from '@react-native-firebase/firestore';
 
 // delete garden -> bu islemin digerleri gibi child componentlarda olması lazım
-const deleteGarden = async (gardenId, onDelete) => {
+const deleteGarden = async (gardenId, onUpdate) => {
   const ref = firestore()
     .collection('gardens')
     .doc(gardenId)
   await ref.delete(gardenId)
     .then(() => {
       ToastAndroid.show('Garden is deleted.', ToastAndroid.SHORT);
-      onDelete(gardenId);
+      onUpdate();
     })
     .catch((error) => {
       console.error(error);
     });
 }
 
-const GardenCard = ({ garden, onDelete }) => {
+const GardenCard = ({ garden, onUpdate }) => {
   const garden_image =
     ! garden.image_url
       ? 'https://cdn-icons-png.flaticon.com/512/3039/3039008.png'
@@ -93,7 +93,7 @@ const GardenCard = ({ garden, onDelete }) => {
                 <View
                   style={{backgroundColor: '#888888', height: 1, width: '100%'}}
                 />
-                <MenuOption onSelect={() => deleteGarden(garden.id, onDelete)}>
+                <MenuOption onSelect={() => deleteGarden(garden.id, onUpdate)}>
                   <Text style={{textAlign: 'center', color: 'red'}}>
                     Delete
                   </Text>

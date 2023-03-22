@@ -42,7 +42,7 @@ const Gardens = ({ navigation }) => {
   return (
     gardens.length == 0
       ? <EmptyGardens navigation={navigation} />
-      : <FilledGardens navigation={navigation} gardens={gardens} onAdd={updateGardens} onDelete={updateGardens}/>
+      : <FilledGardens navigation={navigation} gardens={gardens} onUpdate={updateGardens}/>
   )
 }
 

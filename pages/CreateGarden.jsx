@@ -25,7 +25,7 @@ const gardenTypeList = [
   { id: 5, name: 'Water garden' },
 ];
 const CreateGarden = ({ route, navigation }) => {
-  const onAdd = route.params && route.params.onAdd ? route.params.onAdd : () => {};
+  const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
   const polygon = route.params && route.params.coordinates ? route.params.coordinates : [];
   const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
@@ -68,7 +68,7 @@ const CreateGarden = ({ route, navigation }) => {
         ...gardenData,
       })
       .then(() => {
-        onAdd();
+        onUpdate();
         ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
         navigation.navigate('Gardens');
       })

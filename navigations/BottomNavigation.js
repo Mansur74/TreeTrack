@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get("window")
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
-const BottomNavigation = () => {
+const BottomNavigation = ({setIsSigned}) => {
 
   return (
 
@@ -119,7 +119,6 @@ const BottomNavigation = () => {
 
         <Tab.Screen
           name="SettingsStack"
-          component={SettingsStack}
           options={{
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -134,6 +133,7 @@ const BottomNavigation = () => {
               </View>
             ),
           }}>
+            {() => <SettingsStack setIsSigned={setIsSigned} />}
 
         </Tab.Screen>
       </Tab.Navigator>
@@ -175,13 +175,13 @@ const AddNoteStack = () => {
     );
 }
 
-const SettingsStack = () => {
+const SettingsStack = ({setIsSigned}) => {
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="Settings" component={Settings} initialParams={{ setIsSigned }} />
       <Stack.Screen name="Profile" component={Profile} />
     </Stack.Navigator>
   );

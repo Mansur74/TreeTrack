@@ -1,48 +1,66 @@
 import LinearGradient from "react-native-linear-gradient";
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
 import CheckBox from "@react-native-community/checkbox";
 
-const SignUp = ({ setIsSign, setIsSignedIn }) => {
+const SignUp = ({ setIsInSignIn, setIsSigned }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
 
   const handleSignUp = () => {
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // oturum açan kullanıcının durumunu dinle
-        auth().onAuthStateChanged((user) => {
-          if (user) {
-            console.log(user)
-            const { uid, email } = user;
-            const ref = firestore().collection('users').doc(uid)
-            ref.set({
-              "user_uid": uid,
-              "name": name,
-              "email": email,
+    if (toggleCheckBox && email != '' & name != '' && password != '' & confirmPassword != '') {
+      if (password !== confirmPassword) {
+        ToastAndroid.show('Passwords do not match!', ToastAndroid.SHORT);
+        return;
+      }
+      auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // oturum açan kullanıcının durumunu dinle
+          auth().onAuthStateChanged((user) => {
+            if (user) {
+              console.log(user)
+              const { uid, email } = user;
+              const ref = firestore().collection('users').doc(uid)
+              ref.set({
+                "user_uid": uid,
+                "name": name,
+                "email": email,
 
-            })
+              })
 
-          }
+            }
 
+          });
+          setIsSigned(true);
+          console.log('User signed up!');
+          ToastAndroid.show('User signed up!', ToastAndroid.SHORT);
+
+        })
+        .catch((error) => {
+          console.log(error);
+          ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
         });
-        console.log('User signed in!');
-        setIsSignedIn(true);
+    }
 
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    else if (email == '' || password == '' || name == '' || confirmPassword != '') {
+      ToastAndroid.show('Please fill the form corretcly!', ToastAndroid.SHORT);
+    }
+
+    else {
+      ToastAndroid.show('Please, read and confirm the terms and conditions!', ToastAndroid.SHORT);
+    }
+
   };
 
   const handleSignIn = () => {
-    setIsSign(true)
+    setIsInSignIn(true)
   }
 
   return (
@@ -57,6 +75,10 @@ const SignUp = ({ setIsSign, setIsSignedIn }) => {
       }}>
 
       <Image
+        resizeMode="contain"
+        style={{
+          width: "75%"
+        }}
         source={require("../images/tree_track.png")}>
 
       </Image>
@@ -86,7 +108,7 @@ const SignUp = ({ setIsSign, setIsSignedIn }) => {
               marginTop: 30,
               marginBottom: 10
             }}>
-              welcome :)
+            welcome :)
           </Text>
 
           <TextInput
@@ -133,7 +155,10 @@ const SignUp = ({ setIsSign, setIsSignedIn }) => {
           />
 
           <TextInput
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
             placeholder="Confirm password"
+            secureTextEntry={true}
             style={{
               backgroundColor: "white",
               borderRadius: 50,
@@ -180,16 +205,17 @@ const SignUp = ({ setIsSign, setIsSignedIn }) => {
       <TouchableOpacity
         onPress={handleSignUp}
         style={{
+          justifyContent: "center",
           backgroundColor: '#36861C',
-          padding: 20,
           borderRadius: 50,
           marginTop: 15,
           marginLeft: 50,
           marginRight: 50,
+          height: 50,
           width: "75%",
           elevation: 5
         }}>
-        <Text style={{ color: '#fff', fontSize: 16, alignSelf: "center" }}>SIGN UP</Text>
+        <Text style={{ color: '#fff', fontSize: 16, textAlign: "center" }}>SIGN UP</Text>
       </TouchableOpacity>
 
       <View
@@ -207,7 +233,7 @@ const SignUp = ({ setIsSign, setIsSignedIn }) => {
             textDecorationLine: "underline",
             fontWeight: "bold"
           }}>
-          {'\t'}Login
+          {'\t'}Sign in
         </Text>
       </View>
 

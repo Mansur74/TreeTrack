@@ -1,30 +1,40 @@
 import LinearGradient from "react-native-linear-gradient";
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
 import CheckBox from "@react-native-community/checkbox";
 
-const SignIn = ({setIsSignedIn, setIsSign}) => {
+const SignIn = ({ setIsInSignIn, setIsSigned }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   const handleLogin = () => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('User signed in!');
-        setIsSignedIn(true)
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    if (email != '' && password != '') {
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          setIsSigned(true)
+          console.log('User signed in!');
+          ToastAndroid.show('User signed in succesfully.', ToastAndroid.SHORT);
+        })
+        .catch(error => {
+          console.error(error);
+          ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
+        });
+    }
+    else if (email == '' || password == '') {
+      ToastAndroid.show('Email and password can not be empty!', ToastAndroid.SHORT);
+    }
+
+    else {
+      ToastAndroid.show('Please, read and confirm the terms and conditions!', ToastAndroid.SHORT);
+    }
   };
-  
-  const handleSignUp = () =>
-  {
-    setIsSign(false)
+
+  const handleSignUp = () => {
+    setIsInSignIn(false)
   }
 
   return (
@@ -39,6 +49,10 @@ const SignIn = ({setIsSignedIn, setIsSign}) => {
       }}>
 
       <Image
+        resizeMode="contain"
+        style={{
+          width: "75%"
+        }}
         source={require("../images/tree_track.png")}>
 
       </Image>
@@ -68,7 +82,7 @@ const SignIn = ({setIsSignedIn, setIsSign}) => {
               marginTop: 30,
               marginBottom: 10
             }}>
-              welcome :)
+            welcome :)
           </Text>
 
           <TextInput
@@ -100,12 +114,23 @@ const SignIn = ({setIsSignedIn, setIsSign}) => {
             }}
           />
 
+          <Text
+            style={{
+              color: "white",
+              textDecorationLine: "underline",
+              marginTop: 10,
+              marginLeft: 10
+            }}>
+            Forgot password?
+          </Text>
+
           <View
             style={{
               flexDirection: "row",
               marginTop: 10,
               alignItems: "center"
             }}>
+
             <CheckBox
               disabled={false}
               value={toggleCheckBox}
@@ -117,16 +142,10 @@ const SignIn = ({setIsSignedIn, setIsSign}) => {
               style={{
                 color: "white",
               }}>
-              I accept the
+              Remember me
             </Text>
 
-            <Text
-              style={{
-                color: "white",
-                textDecorationLine: "underline"
-              }}>
-              {'\t'}terms and conditions
-            </Text>
+
           </View>
 
 
@@ -139,16 +158,17 @@ const SignIn = ({setIsSignedIn, setIsSign}) => {
       <TouchableOpacity
         onPress={handleLogin}
         style={{
+          justifyContent: "center",
           backgroundColor: '#36861C',
-          padding: 20,
           borderRadius: 50,
           marginTop: 15,
           marginLeft: 50,
           marginRight: 50,
+          height: 50,
           width: "75%",
           elevation: 5
         }}>
-        <Text style={{ color: '#fff', fontSize: 16, alignSelf: "center" }}>SIGN IN</Text>
+        <Text style={{ color: '#fff', fontSize: 16, textAlign: "center" }}>SIGN IN</Text>
       </TouchableOpacity>
 
       <View

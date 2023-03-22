@@ -2,7 +2,10 @@ import { View, Text, TouchableOpacity, Image } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 
-const Settings = ({navigation}) => {
+const Settings = ({navigation, route}) => {
+
+  const { setIsSigned } = route.params;
+  
   return (
 
     <LinearGradient
@@ -30,7 +33,7 @@ const Settings = ({navigation}) => {
 
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Profile")
+              navigation.navigate("Profile", {setIsSigned: setIsSigned})
             }}
             style={{
               padding: 10,
