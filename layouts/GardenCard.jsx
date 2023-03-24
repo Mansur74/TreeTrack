@@ -1,20 +1,16 @@
 import { Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu"
-import firestore from '@react-native-firebase/firestore';
+import { deleteGarden } from "../services/garden_services";
 
 // delete garden -> bu islemin digerleri gibi child componentlarda olması lazım
-const deleteGarden = async (gardenId, onUpdate) => {
-  const ref = firestore()
-    .collection('gardens')
-    .doc(gardenId)
-  await ref.delete(gardenId)
-    .then(() => {
-      ToastAndroid.show('Garden is deleted.', ToastAndroid.SHORT);
-      onUpdate();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+const handleDelete = async (gardenId, onUpdate) => {
+  try {
+    await deleteGarden(gardenId);
+    ToastAndroid.show('Garden is deleted.', ToastAndroid.SHORT);
+    onUpdate(); 
+  } catch (error) {
+    console.log("Delete garden error: ", error)
+  }
 }
 
 const GardenCard = ({ garden, onUpdate }) => {
@@ -93,7 +89,7 @@ const GardenCard = ({ garden, onUpdate }) => {
                 <View
                   style={{backgroundColor: '#888888', height: 1, width: '100%'}}
                 />
-                <MenuOption onSelect={() => deleteGarden(garden.id, onUpdate)}>
+                <MenuOption onSelect={() => handleDelete(garden.id, onUpdate)}>
                   <Text style={{textAlign: 'center', color: 'red'}}>
                     Delete
                   </Text>

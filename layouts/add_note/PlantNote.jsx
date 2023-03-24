@@ -10,26 +10,15 @@ import styles from '../../styles/Style';
 import React, {useState, useEffect} from 'react';
 import PhotoPick from '../ImagePicker';
 import {Picker} from '@react-native-picker/picker';
-import firestore from '@react-native-firebase/firestore';
-
-const getGardensFb = async () => {
-  const querySnapshot = await firestore().collection('gardens').get();
-  const gList = querySnapshot.docs.map(doc => {
-    const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
-    data.polygon = data.polygon.flat();
-    return data;
-  });
-  return gList;
-};
+import { getUserGardens } from '../../services/garden_services';
 
 
 const PlantNote = ({navigation}) => {
-  const [gardenList, setGList] = useState([]);
+  const [gardenList, setGardenList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      setGList(await getGardensFb());
+      setGardenList(await getUserGardens());
     };
     fetchData();
   }, []);

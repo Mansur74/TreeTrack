@@ -4,6 +4,8 @@ import { View, Text, TextInput, TouchableOpacity, Image, ToastAndroid } from 're
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
 import CheckBox from "@react-native-community/checkbox";
+import { saveUserId } from "../services/storage";
+
 
 const SignIn = ({ setIsInSignIn, setIsSigned }) => {
   const [email, setEmail] = useState('');
@@ -14,17 +16,18 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
     if (email != '' && password != '') {
       auth()
         .signInWithEmailAndPassword(email, password)
-        .then((response) => {
-          const uid = response.user.uid
-          const usersRef = firestore().collection('users').doc(uid)
+        .then(response => {
+          const uid = response.user.uid;
+          const usersRef = firestore().collection('users').doc(uid);
           usersRef
             .get()
-            .then(firestoreDocument => {
+            .then(async firestoreDocument => {
               if (!firestoreDocument.exists) {
                 ToastAndroid.show('User does not exist!', ToastAndroid.SHORT);
               }
               usersRef.update({remember_auth: toggleCheckBox});
               setIsSigned(true);
+              await saveUserId(uid, toggleCheckBox);
               ToastAndroid.show(
                 'User signed in succesfully.',
                 ToastAndroid.SHORT,
@@ -34,19 +37,21 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
               console.error(error);
               ToastAndroid.show(error.toString(), ToastAndroid.SHORT);
             });
-          
         })
         .catch(error => {
           console.log(error);
           ToastAndroid.show(error.message.split('] ')[1], ToastAndroid.SHORT);
         });
-    }
-    else if (email == '' || password == '') {
-      ToastAndroid.show('Email and password cannot be empty!', ToastAndroid.SHORT);
-    }
-
-    else {
-      ToastAndroid.show('Please, read and confirm the terms and conditions!', ToastAndroid.SHORT);
+    } else if (email == '' || password == '') {
+      ToastAndroid.show(
+        'Email and password cannot be empty!',
+        ToastAndroid.SHORT,
+      );
+    } else {
+      ToastAndroid.show(
+        'Please, read and confirm the terms and conditions!',
+        ToastAndroid.SHORT,
+      );
     }
   };
 

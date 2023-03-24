@@ -13,8 +13,8 @@ import styles from '../styles/Style';
 import React, { useState, useEffect } from 'react';
 import PhotoPick from '../layouts/ImagePicker';
 import { useRoute } from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore'
 import storage from "@react-native-firebase/storage"
+import { insertGarden } from '../services/garden_services';
 
 // fake data - TODO: retrieve from API
 const gardenTypeList = [
@@ -57,24 +57,15 @@ const CreateGarden = ({ route, navigation }) => {
       polygon: polygon,
       image_url: imageUrl
     };
-
-    const ref = firestore().collection('gardens').doc()
-    await ref
-      .set({
-        id: ref.id,
-        polygon: gardenData.polygon.map(
-          coordinate => new firestore.GeoPoint(coordinate.latitude, coordinate.longitude),
-        ),
-        ...gardenData,
-      })
-      .then(() => {
-        onUpdate();
-        ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
-        navigation.navigate('Gardens');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    try {
+      await insertGarden(gardenData);
+      ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
+      onUpdate();
+      navigation.navigate('Gardens');  
+    } catch (error) {
+      console.log("Insert garden error: ", error)
+    }
+    
   };
 
   const uploadImage = async (imageUri, folderName) => {

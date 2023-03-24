@@ -3,7 +3,6 @@ import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 import React, {useState, useEffect} from 'react';
 import Geolocation from '@react-native-community/geolocation';
-import firestore from '@react-native-firebase/firestore';
 // import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import MapView, {
   PROVIDER_GOOGLE,
@@ -11,26 +10,7 @@ import MapView, {
   Marker,
   Polyline,
 } from 'react-native-maps';
-// get gardens
-const getGardens = async () => {
-  gList = []
-  await firestore()
-    .collection('gardens')
-    .orderBy('created_at', 'desc')
-    .get()
-    .then(querySnapshot => {
-      gList = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        data.created_at = String(data.created_at.toDate());
-        data.polygon = data.polygon.flat();
-        return data;
-      });
-    })
-    .catch(error => {
-      console.error(error);
-    });
-  return gList
-}
+import { getUserGardens } from "../services/garden_services";
 
 const Map = () => {
 	const [currentPosition, setPosition] = useState({
@@ -54,7 +34,7 @@ const Map = () => {
 	
 	const [gardens, setGardens] = useState([]);useEffect(() => {
 		const fetchData = async () => {
-		const data = await getGardens();
+		const data = await getUserGardens();
 		setGardens(data);
 		};
 		fetchData();

@@ -9,7 +9,7 @@ import {useRoute} from '@react-navigation/native';
 import storage from "@react-native-firebase/storage"
 import firestore from '@react-native-firebase/firestore';
 
-
+// TODO: service
 const getPlantOfGarden = async (garden_id) => {
   const querySnapshot = await firestore()
     .collection('plants')

@@ -16,6 +16,7 @@ const PlantGallery = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedItem, setPressedItem] = useState({});
+  // TODO: user_garden relation + service 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
