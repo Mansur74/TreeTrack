@@ -10,9 +10,8 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PhotoPick from '../layouts/ImagePicker';
-import { useRoute } from '@react-navigation/native';
 import storage from "@react-native-firebase/storage"
 import { insertGarden } from '../services/garden_services';
 
@@ -147,7 +146,7 @@ const CreateGarden = ({ route, navigation }) => {
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  navigation.navigate('DrawPolygon');
+                  navigation.navigate('DrawPolygon', {onUpdate: onUpdate});
                 }}>
                 <Image
                   source={{

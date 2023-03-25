@@ -10,7 +10,8 @@ import MapView, {
 import React, {useState, useEffect} from 'react';
 import Geolocation from '@react-native-community/geolocation';
 
-const DrawPolygon = ({navigation}) => {
+const DrawPolygon = ({navigation, route}) => {
+  const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
    const [currentPosition, setPosition] = useState({
      latitude: 39.941155726554385,
      longitude: 32.85929029670567,
@@ -147,7 +148,7 @@ const DrawPolygon = ({navigation}) => {
         <TouchableOpacity
           style={styles.button_right}
           onPress={() => {
-            navigation.navigate('CreateGarden', {coordinates}); // go back to create page to save garden
+            navigation.navigate('CreateGarden', {coordinates, onUpdate}); // go back to create page to save garden
           }}>
           <Text style={styles.bt1}> Save Area </Text>
         </TouchableOpacity>
