@@ -131,7 +131,7 @@ const CreateGarden = ({ route, navigation }) => {
                     key={gardenType.id}
                     label={gardenType.name}
                     value={gardenType.name}
-                    color="#fff"
+                    
                   />
                 ))}
               </Picker>

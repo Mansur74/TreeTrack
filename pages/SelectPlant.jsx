@@ -34,6 +34,7 @@ const plantTypes = [
   },
 ];
 const SelectPlant = ({navigation}) => {
+  const [selectedMapType, setMapType] = useState("standard");
   const [modalVisible, setModalVisible] = useState(false);
   const [newPlantType, setPickerValue] = useState(plantTypes[0]);
   const [newPlantName, setNewPlantName] = useState(null);
@@ -262,7 +263,8 @@ const SelectPlant = ({navigation}) => {
             style={{width: '100%', height: '100%', marginBottom: 15}}
             showsUserLocation={true}
             initialRegion={region}
-            onPress={handleMapPress}>
+            onPress={handleMapPress}
+            mapType={selectedMapType}>
             {polygon.length > 2 && (
               <Polygon
                 coordinates={polygon}
@@ -312,7 +314,50 @@ const SelectPlant = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            backgroundColor: '#09A555',
+            padding: 4,
+            borderRadius: 8,
+            marginTop: 5
+          }}>
+          <TouchableOpacity
+            onPress={() => setMapType('standard')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'standard' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Standart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMapType('hybrid')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'hybrid' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Hybrid</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMapType('satellite')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'satellite' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Satellite</Text>
+          </TouchableOpacity>
+        </View>
         {/* modal for adding new plant */}
         {modalVisible && (
           <View style={styles.centeredView}>
@@ -374,7 +419,7 @@ const SelectPlant = ({navigation}) => {
                           key={plant_type.id}
                           label={plant_type.plant_type}
                           value={plant_type.plant_type}
-                          color="#fff"
+                          
                         />
                       ))}
                     </Picker>

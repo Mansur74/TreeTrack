@@ -12,6 +12,7 @@ import Geolocation from '@react-native-community/geolocation';
 
 const DrawPolygon = ({navigation, route}) => {
   const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
+  const [selectedMapType, setMapType] = useState('standard');
    const [currentPosition, setPosition] = useState({
      latitude: 39.941155726554385,
      longitude: 32.85929029670567,
@@ -102,13 +103,15 @@ const DrawPolygon = ({navigation, route}) => {
             source={require('../images/icons/ic_search.png')}></Image>
         </View>
 
-        <View style={{width: '100%', height: '50%', marginBottom: 15}}>
+        <View style={{width: '100%', height: '55%', marginBottom: 5}}>
           <MapView
             style={{width: '100%', height: '100%', marginBottom: 15}}
             provider={PROVIDER_GOOGLE}
             showsUserLocation={true}
             initialRegion={currentPosition}
-            onPress={handleMapPress}>
+            onPress={handleMapPress}
+            mapType={selectedMapType}
+            >
             {coordinates.map((coordinate, index) => (
               <Marker
                 key={index}
@@ -145,6 +148,49 @@ const DrawPolygon = ({navigation, route}) => {
           </View>
         </View>
 
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            backgroundColor: '#09A555',
+            padding: 4,
+            borderRadius: 8,
+          }}>
+          <TouchableOpacity
+            onPress={() => setMapType('standard')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'standard' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Standart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMapType('hybrid')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'hybrid' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Hybrid</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMapType('satellite')}
+            style={{
+              backgroundColor:
+                selectedMapType == 'satellite' ? '#25596E' : '#09A555',
+              paddingHorizontal: 32,
+              paddingVertical: 5,
+              borderRadius: 5,
+            }}>
+            <Text style={{color: "white"}}>Satellite</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
           style={styles.button_right}
           onPress={() => {

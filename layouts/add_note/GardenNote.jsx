@@ -113,7 +113,6 @@ const GardenNote = ({navigation}) => {
                 key={garden.id}
                 label={garden.gardenName}
                 value={garden.id}
-                color="#fff"
               />
             ))}
           </Picker>
