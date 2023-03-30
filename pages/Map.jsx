@@ -33,19 +33,16 @@ const Map = () => {
 		});
 	}, []);
 	
-	const [gardens, setGardens] = useState([]);useEffect(() => {
-		const fetchData = async () => {
-		const data = await getUserGardens();
-		setGardens(data);
-		};
-		fetchData();
-  	}, []);
-	const garden_polygons = []
-	gardens.forEach(element => {
-		garden_polygons.push(element.polygon);
-	});
+	const [gardens, setGardens] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUserGardens();
+      setGardens(data);
+    };
+    fetchData();
+  }, []);
 	
-	//console.log(garden_polygons)
+	console.log("[map] gardens: ", gardens)
 	return (
     // TODO: konuma en yakın bahçeleri poligon olarak göster.
     <LinearGradient
@@ -68,14 +65,23 @@ const Map = () => {
             language: 'en',
           }}
         /> */}
-
         <View style={{width: '100%', height: '70%', marginBottom: 5}}>
           <MapView
             style={{width: '100%', height: '100%'}}
             provider={PROVIDER_GOOGLE}
             showsUserLocation={true}
             initialRegion={currentPosition}
-            mapType={selectedMapType}></MapView>
+            mapType={selectedMapType}>
+            {/* TODO: kullanıcıya en yakın olan bahçeler gösterilecek */}
+            {gardens.map(garden => (
+              <Polygon
+                key={garden.id}
+                coordinates={garden.polygon}
+                strokeWidth={2}
+                fillColor="rgba(167, 255, 200, 0.31)"
+              />
+            ))}
+          </MapView>
         </View>
         <View
           style={{
@@ -87,34 +93,37 @@ const Map = () => {
             borderRadius: 8,
           }}>
           <TouchableOpacity
-            onPress={()=>setMapType("standard")}
+            onPress={() => setMapType('standard')}
             style={{
-              backgroundColor: selectedMapType == 'standard' ? '#25596E' : '#09A555',
+              backgroundColor:
+                selectedMapType == 'standard' ? '#25596E' : '#09A555',
               paddingHorizontal: 32,
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Standart</Text>
+            <Text style={{color: 'white'}}>Standart</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={()=>setMapType("hybrid")}
+            onPress={() => setMapType('hybrid')}
             style={{
-              backgroundColor: selectedMapType == 'hybrid' ? '#25596E' : '#09A555',
+              backgroundColor:
+                selectedMapType == 'hybrid' ? '#25596E' : '#09A555',
               paddingHorizontal: 32,
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Hybrid</Text>
+            <Text style={{color: 'white'}}>Hybrid</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={()=>setMapType("satellite")}
+            onPress={() => setMapType('satellite')}
             style={{
-              backgroundColor: selectedMapType == 'satellite' ? '#25596E' : '#09A555',
+              backgroundColor:
+                selectedMapType == 'satellite' ? '#25596E' : '#09A555',
               paddingHorizontal: 32,
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Satellite</Text>
+            <Text style={{color: 'white'}}>Satellite</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -23,6 +23,7 @@ const PlantNote = ({navigation}) => {
     fetchData();
   }, []);
 
+  {/* TODO: kullanıcıya en yakın olan bahçelere göre bu liste sıralanmalı */}
   let gardenNames = gardenList.map(garden => ({
     id: garden.id,
     gardenName: garden.name,
@@ -44,6 +45,7 @@ const PlantNote = ({navigation}) => {
   return (
     <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
       <ScrollView>
+        <View style={{marginBottom: 90}}>
           <Text style={styles.t4}>
             Take a photo of your plant or select it from your gallery.
           </Text>
@@ -67,7 +69,6 @@ const PlantNote = ({navigation}) => {
                   key={garden.id}
                   label={garden.gardenName}
                   value={garden.id}
-                  
                 />
               ))}
             </Picker>
@@ -95,7 +96,7 @@ const PlantNote = ({navigation}) => {
             }}>
             <Text style={styles.bt1}> Select Plant </Text>
           </TouchableOpacity>
-        
+        </View>
       </ScrollView>
     </LinearGradient>
   );

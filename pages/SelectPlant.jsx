@@ -7,21 +7,8 @@ import Geolocation from '@react-native-community/geolocation';
 import React, { useState, useEffect } from 'react';
 import {useRoute} from '@react-navigation/native';
 import storage from "@react-native-firebase/storage"
-import firestore from '@react-native-firebase/firestore';
-
-// TODO: service
-const getPlantOfGarden = async (garden_id) => {
-  const querySnapshot = await firestore()
-    .collection('plants')
-    .where('garden_id', '==', garden_id)
-    .get();
-  const plantList = querySnapshot.docs.map(doc => {
-    const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
-    return data;
-  });
-  return plantList;
-};
+import { getPlantsOfGarden, isInsidePolygon } from '../services/garden_services';
+import { insertNewPlant, insertPlantNote } from '../services/plant_services';
 
 const plantTypes = [
   {
@@ -47,27 +34,17 @@ const SelectPlant = ({navigation}) => {
       location: newPlantLocation,
       garden_id: selectedGarden.id,
     };
-    const ref = firestore().collection('plants').doc();
-    await ref
-      .set({
-        id: ref.id,
-        location: new firestore.GeoPoint(
-          newPlant.location.latitude,
-          newPlant.location.longitude,
-        ),
-        ...newPlant,
-      })
-      .then(() => {
-        setModalVisible(!modalVisible)
-        ToastAndroid.show('New plant is saved.', ToastAndroid.SHORT);
-        newPlant = {...newPlant, id: ref.id}
-        // console.log('Inserted newPlant: ', newPlant);
-        plants.push(newPlant)
-        setSelectedPlant(newPlant);
-      })
-      .catch(error => {
-        console.error("add plant err: ", error);
-      });
+    try {
+      const ref_id = await insertNewPlant(newPlant)
+      setModalVisible(!modalVisible);
+      ToastAndroid.show('New plant is saved.', ToastAndroid.SHORT);
+      newPlant = { ...newPlant, id: ref_id };
+      // console.log('Inserted newPlant: ', newPlant);
+      plants.push(newPlant);
+      setSelectedPlant(newPlant);
+    } catch (error) {
+      console.error('add plant err: ', error);
+    }
   };
   // get current position
   const [currentPosition, setPosition] = useState({
@@ -96,7 +73,7 @@ const SelectPlant = ({navigation}) => {
   // get plants of selected garden
   useEffect(() => {
     const fetchData = async () => {
-      setPlantList(await getPlantOfGarden(selectedGarden.id));
+      setPlantList(await getPlantsOfGarden(selectedGarden.id));
     };
     fetchData();
   }, []);
@@ -229,16 +206,16 @@ const SelectPlant = ({navigation}) => {
         note: plantNote,
         image_url: imageUrl,
       };
-      const newPlantNoteRf = await firestore()
-        .collection('plant_notes')
-        .add(newPlantNote);
-      await newPlantNoteRf.update({id: newPlantNoteRf.id});
-
-      ToastAndroid.show(
-        'Plant note for ' + selectedPlant.name + ' is saved.',
-        ToastAndroid.LONG,
-      );
-      navigation.navigate('AddNote');
+      try {
+        await insertPlantNote(newPlantNote); 
+        ToastAndroid.show(
+          'Plant note for ' + selectedPlant.name + ' is saved.',
+          ToastAndroid.LONG,
+        );
+        navigation.navigate('AddNote');
+      } catch (error) {
+        console.log('Insert plant note error: ', error);
+      }
     }
   };
 
@@ -505,21 +482,5 @@ const SelectPlant = ({navigation}) => {
   );
 };
 
-// Ray Casting algorithm to determine whether a point is inside of given polygon
-function isInsidePolygon(point, polygon) {
-  let x = point.latitude,
-    y = point.longitude;
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    let xi = polygon[i].latitude,
-      yi = polygon[i].longitude;
-    let xj = polygon[j].latitude,
-      yj = polygon[j].longitude;
-    let intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
 
 export default SelectPlant;

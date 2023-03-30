@@ -1,8 +1,8 @@
-import {ScrollView, View, Text, Image, TouchableOpacity, Modal, StyleSheet} from 'react-native';
+import {ScrollView, View, Text, Image, TouchableOpacity, Modal} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import firestore from '@react-native-firebase/firestore';
 import React, {useState, useEffect} from 'react';
 import styles from '../../styles/Style';
+import { getPlantNotes } from '../../services/plant_services';
 
 
 const formatDate = date => {
@@ -16,36 +16,12 @@ const PlantGallery = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedItem, setPressedItem] = useState({});
-  // TODO: user_garden relation + service 
+  
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      let querySnapshot = await firestore().collection('plants').get();
-      const plants = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        data.created_at = String(data.created_at.toDate());
-        return data;
-      });
-
-      let querySnapshot2 = await firestore()
-        .collection('plant_notes')
-        .orderBy('created_at', 'desc')
-        .get();
-      const garden_notes = querySnapshot2.docs.map(doc => {
-        const data = doc.data();
-        data.created_at = String(data.created_at.toDate());
-        return data;
-      });
-
-      let notesWithPlantName = [];
-      garden_notes.forEach(note => {
-        let plant = plants.find(p => p.id === note.plant_id);
-        if (plant) {
-          note.plant_name = plant.name;
-          notesWithPlantName.push(note);
-        }
-      });
-      setNoteList(notesWithPlantName);
+      const plantNotes = await getPlantNotes()
+      setNoteList(plantNotes);
       setIsLoading(false);
     };
     fetchData();

@@ -5,12 +5,11 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  StyleSheet,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import firestore from '@react-native-firebase/firestore';
 import React, {useState, useEffect} from 'react';
 import styles from "../../styles/Style";
+import { getGardenNotes } from '../../services/garden_services';
 
 
 const formatDate = (date) => {
@@ -19,40 +18,16 @@ const formatDate = (date) => {
   return date  
 }
 const GardenGallery = () => {
-  const [gardenNoteList, setNoteGList] = useState([]);
+  const [gardenNoteList, setNoteList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedItem, setPressedItem] = useState({});
-  // TODO: user_garden relation + service 
+
   useEffect(() => {
       const fetchData = async () => {
         setIsLoading(true)
-        let querySnapshot = await firestore().collection('gardens').get();
-        const gardens = querySnapshot.docs.map(doc => {
-           const data = doc.data();
-           data.created_at = String(data.created_at.toDate());
-           return data;
-         });
-        
-        let querySnapshot2 = await firestore()
-          .collection('garden_notes')
-          .orderBy('created_at', 'desc')
-          .get();
-        const garden_notes = querySnapshot2.docs.map(doc => {
-          const data = doc.data();
-          data.created_at = String(data.created_at.toDate());
-          return data;
-        });
-        
-        let notesWithGardenName = [];
-        garden_notes.forEach(note => {
-          let garden = gardens.find(g => g.id === note.garden_id);
-          if (garden) {
-            note.garden_name = garden.name;
-            notesWithGardenName.push(note);
-          }
-        });
-        setNoteGList(notesWithGardenName)
+        const gardenNotes = await getGardenNotes()
+        setNoteList(gardenNotes)
         setIsLoading(false)
       };
       fetchData();

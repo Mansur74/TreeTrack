@@ -12,7 +12,7 @@ import React, {useState, useEffect} from 'react';
 import PhotoPick from '../ImagePicker';
 import {Picker} from '@react-native-picker/picker';
 import storage from '@react-native-firebase/storage';
-import {getUserGardens} from '../../services/garden_services';
+import {getUserGardens, insertGardenNote} from '../../services/garden_services';
 
 const GardenNote = ({navigation}) => {
   const [gardenList, setGardenList] = useState([]);
@@ -24,6 +24,7 @@ const GardenNote = ({navigation}) => {
     fetchData();
   }, []);
 
+  {/* TODO: kullanıcıya en yakın olan bahçelere göre bu liste sıralanmalı */}
   let gardenNames = gardenList.map(garden => ({
     id: garden.id,
     gardenName: garden.name,
@@ -75,63 +76,65 @@ const GardenNote = ({navigation}) => {
       note: gardenNote,
       image_url: imageUrl,
     };
-    const newGardenNoteRf = await firestore()
-      .collection('garden_notes')
-      .add(newGardenNote);
-      
-    await newGardenNoteRf.update({id: newGardenNoteRf.id});
-
-    ToastAndroid.show(
-      'Garden note for ' + selectedGarden.name + ' is saved.',
-      ToastAndroid.LONG,
-    );
-    navigation.navigate('AddNote');
+    try {
+      await insertGardenNote(newGardenNote);
+      ToastAndroid.show(
+        'Garden note for ' + selectedGarden.name + ' is saved.',
+        ToastAndroid.LONG,
+      );
+      navigation.navigate('AddNote');  
+    } catch (error) {
+      console.log('Insert garden note error: ', error);
+    }
+    
   };
   return (
     <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
       <ScrollView>
-        <Text style={styles.t4}>
-          Take a photo of your garden or select it from your gallery.
-        </Text>
-        <PhotoPick onSelect={onSelectImage}></PhotoPick>
+        <View style={{marginBottom: 90}}>
+          <Text style={styles.t4}>
+            Take a photo of your garden or select it from your gallery.
+          </Text>
+          <PhotoPick onSelect={onSelectImage}></PhotoPick>
 
-        <Text style={styles.t4}>Select a garden</Text>
-        <View style={styles.picker_view}>
-          <Picker
-            dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
-            dropdownIconColor={'#21212110'}
-            style={{color: '#212121'}}
-            selectedValue={pickerValue}
-            onValueChange={itemValue => {
-              setPickerValue(itemValue);
-              setSelectedGarden(
-                gardenList.find(garden => garden.id === itemValue),
-              );
-            }}>
-            {gardenNames.map(garden => (
-              <Picker.Item
-                key={garden.id}
-                label={garden.gardenName}
-                value={garden.id}
-              />
-            ))}
-          </Picker>
+          <Text style={styles.t4}>Select a garden</Text>
+          <View style={styles.picker_view}>
+            <Picker
+              dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
+              dropdownIconColor={'#21212110'}
+              style={{color: '#212121'}}
+              selectedValue={pickerValue}
+              onValueChange={itemValue => {
+                setPickerValue(itemValue);
+                setSelectedGarden(
+                  gardenList.find(garden => garden.id === itemValue),
+                );
+              }}>
+              {gardenNames.map(garden => (
+                <Picker.Item
+                  key={garden.id}
+                  label={garden.gardenName}
+                  value={garden.id}
+                />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.t4}>Enter your notes</Text>
+          <TextInput
+            value={gardenNote}
+            onChangeText={text => setTextInputValue(text)}
+            multiline
+            numberOfLines={5}
+            placeholder="Garden notes..."
+            placeholderTextColor={'#21212160'}
+            style={styles.text_area}
+          />
+          {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}
+          <TouchableOpacity style={styles.button_right} onPress={saveNote}>
+            <Text style={styles.bt1}> Save </Text>
+          </TouchableOpacity>
         </View>
-
-        <Text style={styles.t4}>Enter your notes</Text>
-        <TextInput
-          value={gardenNote}
-          onChangeText={text => setTextInputValue(text)}
-          multiline
-          numberOfLines={5}
-          placeholder="Garden notes..."
-          placeholderTextColor={'#21212160'}
-          style={styles.text_area}
-        />
-        {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}
-        <TouchableOpacity style={styles.button_right} onPress={saveNote}>
-          <Text style={styles.bt1}> Save </Text>
-        </TouchableOpacity>
       </ScrollView>
     </LinearGradient>
   );
