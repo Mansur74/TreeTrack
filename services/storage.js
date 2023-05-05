@@ -22,3 +22,13 @@ export const saveUserId = async (userId, remember_auth) => {
     console.log('Error saving user ID + remember auth: ', error);
   }
 };
+
+// oturum açılırken user_uid ve hatırlama tercihi async storage'a kaydedilir
+export const removeUserId = async () => {
+  try {
+    await AsyncStorage.clear()
+    console.log('User info cleared!');
+  } catch (error) {
+    console.log('Error clearing: ', error);
+  }
+};

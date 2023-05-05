@@ -4,6 +4,7 @@ import LinearGradient from "react-native-linear-gradient";
 import styles from "../styles/Style";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
+import { removeUserId } from "../services/storage";
 
 const Profile = ({route}) => {
   
@@ -22,9 +23,10 @@ const Profile = ({route}) => {
   const handleSignOut = () => {
     auth()
     .signOut()
-    .then(() => {
-      console.log('User signed out!')
+    .then(async() => {
       setIsSigned(false)
+      await removeUserId();
+      console.log('User signed out!')
     });
   }
 

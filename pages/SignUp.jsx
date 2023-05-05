@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, ToastAndroid } from 're
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'
 import CheckBox from "@react-native-community/checkbox";
+import { saveUserId } from "../services/storage";
 
 const SignUp = ({ setIsInSignIn, setIsSigned }) => {
   const [name, setName] = useState('');
@@ -22,7 +23,7 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
       }
       auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((response) => {
+        .then(async (response) => {
           const { uid, email } = response.user;
           const ref = firestore().collection('users').doc(uid)
           ref.set({
@@ -32,6 +33,7 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             "remember_auth": rememberToggleCheckBox
           })
           setIsSigned(true);
+          await saveUserId(uid, toggleCheckBox);
           console.log('User signed up!');
           ToastAndroid.show('User signed up!', ToastAndroid.SHORT);
 

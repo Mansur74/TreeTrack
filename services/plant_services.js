@@ -1,5 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
-import {getUserGardenIds} from './garden_services';
+import { getUserGardenIds } from './garden_services';
 
 export const getPlantNotes = async () => {
   const gardenIds = await getUserGardenIds();
@@ -55,5 +55,5 @@ export const insertPlantNote = async plantNote => {
   const plantNoteRf = await firestore()
     .collection('plant_notes')
     .add(plantNote);
-  await plantNoteRf.update({id: plantNoteRf.id});
+  await plantNoteRf.update({ id: plantNoteRf.id });
 };
