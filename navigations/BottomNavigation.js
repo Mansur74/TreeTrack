@@ -12,13 +12,16 @@ import SelectPlant from "../pages/SelectPlant"
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import DrawPolygon from "../pages/DrawPolygon";
 import Settings from "../pages/Settings";
+import ViewGarden from "../pages/ViewGarden";
+import Plants from "../pages/Plants";
+import CreatePlant from "../pages/CreatePlant";
 
 
 const { width, height } = Dimensions.get("window")
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
-const BottomNavigation = ({setIsSigned}) => {
+const BottomNavigation = ({ setIsSigned }) => {
 
   return (
 
@@ -133,7 +136,7 @@ const BottomNavigation = ({setIsSigned}) => {
               </View>
             ),
           }}>
-            {() => <SettingsStack setIsSigned={setIsSigned} />}
+          {() => <SettingsStack setIsSigned={setIsSigned} />}
 
         </Tab.Screen>
       </Tab.Navigator>
@@ -157,6 +160,18 @@ const GardensStack = () => {
         component={CreateGarden} />
 
       <Stack.Screen
+        name="ViewGarden"
+        component={ViewGarden} />
+
+      <Stack.Screen
+        name="Plants"
+        component={Plants} />
+
+      <Stack.Screen
+        name="CreatePlant"
+        component={CreatePlant} />
+
+      <Stack.Screen
         name="DrawPolygon"
         component={DrawPolygon} />
     </Stack.Navigator>
@@ -164,18 +179,18 @@ const GardensStack = () => {
 }
 
 const AddNoteStack = () => {
-    return (
-        <Stack.Navigator
-            screenOptions={{
-                headerShown: false,
-            }}>
-            <Stack.Screen name="AddNote" component={AddNote} />
-            <Stack.Screen name="SelectPlant" component={SelectPlant} />
-        </Stack.Navigator>
-    );
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="AddNote" component={AddNote} />
+      <Stack.Screen name="SelectPlant" component={SelectPlant} />
+    </Stack.Navigator>
+  );
 }
 
-const SettingsStack = ({setIsSigned}) => {
+const SettingsStack = ({ setIsSigned }) => {
   return (
     <Stack.Navigator
       screenOptions={{

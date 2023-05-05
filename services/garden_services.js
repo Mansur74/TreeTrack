@@ -147,3 +147,44 @@ export const insertGardenNote = async gardenNote => {
     .add(gardenNote);
   await gardenNoteRf.update({id: gardenNoteRf.id});
 };
+
+//
+export const insertPlant = async plantData => {
+  const plantRef = firestore().collection('plants').doc();
+  await plantRef.set({
+    garden_id: plantData.garden_id,
+    id: plantRef.id,
+    location: plantData.location.map(
+      coordinate =>
+        new firestore.GeoPoint(coordinate.latitude, coordinate.longitude),
+    ),
+    ...plantData,
+  });
+};
+//
+export const insertPlantNote = async plantNote => {
+  const plantNoteRf = await firestore()
+    .collection('plant_notes')
+    .add(plantNote);
+  await plantNoteRf.update({id: plantNoteRf.id});
+};
+
+//
+export const deletePlant = async plantId => {
+  const plantNoteRf = firestore()
+    .collection('plant_notes')
+    .where('plant_id', '==', plantId);
+
+  const querySnapshot = await plantNoteRf.get();
+  querySnapshot.forEach(async doc => {
+    console.log(doc)
+    await doc.ref.delete();
+  });
+
+  const plantRf = firestore()
+    .collection('plants')
+    .doc(plantId)
+
+  await plantRf.delete();
+}
+
