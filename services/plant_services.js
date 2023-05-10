@@ -1,8 +1,13 @@
 import firestore from '@react-native-firebase/firestore';
-import { getUserGardenIds } from './garden_services';
+import { getPlantsOfGarden, getUserGardenIds } from './garden_services';
+import * as geolib from 'geolib';
 
 export const getPlantNotes = async () => {
   const gardenIds = await getUserGardenIds();
+  if(gardenIds.length == 0){
+    console.log("Empty garden id list.")
+    return []
+  }
   const plantIds = [];
   let plantsRef = await firestore()
     .collection('plants')
@@ -57,3 +62,58 @@ export const insertPlantNote = async plantNote => {
     .add(plantNote);
   await plantNoteRf.update({ id: plantNoteRf.id });
 };
+
+export const deletePlant = async plantId => {
+  const plantNoteRf = firestore()
+    .collection('plant_notes')
+    .where('plant_id', '==', plantId);
+
+  const querySnapshot = await plantNoteRf.get();
+  querySnapshot.forEach(async doc => {
+    console.log("Deleted plant: ", doc)
+    await doc.ref.delete();
+  });
+
+  const plantRf = firestore()
+    .collection('plants')
+    .doc(plantId)
+
+  await plantRf.delete();
+}
+
+export const getSortedPlantsByDistance = async (userLocation, gardenId) => {
+  const plants = await getPlantsOfGarden(gardenId)
+  let plantsWithLocation = []
+  let plantsWithoutLocation = []
+  plants.forEach(plant => {
+    if(plant.location){
+      const distance = geolib.getDistance(plant.location, userLocation, accuracy= 1);
+      plant.distance = distance
+      plantsWithLocation.push(plant)
+    }
+    else{
+      plantsWithoutLocation.push(plant)
+    }
+  });
+  const sortedPlants = plantsWithLocation.sort((a, b) => b.distance - a.distance);
+  const concatenatedPlantList = sortedPlants.concat(plantsWithoutLocation)
+  return concatenatedPlantList
+}
+
+export const getClosestPlant = async (userLocation, gardenId) => {
+  
+  const plants = await getPlantsOfGarden(gardenId)
+  let closestPlant = null
+  let minDistance = -1
+  plants.forEach(plant => {
+    if(plant.location){
+      const distance = geolib.getDistance(plant.location, userLocation, accuracy= 1);
+      plant.distance = distance
+      if(minDistance === -1 || distance < minDistance){
+        minDistance = distance
+        closestPlant = plant
+      }
+    }
+  });
+  return closestPlant
+}

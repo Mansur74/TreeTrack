@@ -12,14 +12,33 @@ import React, {useState, useEffect} from 'react';
 import PhotoPick from '../ImagePicker';
 import {Picker} from '@react-native-picker/picker';
 import storage from '@react-native-firebase/storage';
-import {getUserGardens, insertGardenNote} from '../../services/garden_services';
+import {getSortedGardensByDistance, insertGardenNote} from '../../services/garden_services';
+import Geolocation from '@react-native-community/geolocation';
 
 const GardenNote = ({navigation}) => {
   const [gardenList, setGardenList] = useState([]);
-
+  const [currentPosition, setPosition] = useState({
+    latitude: 39.941155726554385,
+    longitude: 32.85929029670567,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+  useEffect(() => {
+    Geolocation.getCurrentPosition(pos => {
+      const crd = pos.coords;
+      setPosition({
+        latitude: crd.latitude,
+        longitude: crd.longitude,
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+      });
+    });
+  }, []);
+  // bahçeler kullanıcının konumuna olan yakınlığına göre sıralanır
   useEffect(() => {
     const fetchData = async () => {
-      setGardenList(await getUserGardens());
+      setGardenList(await getSortedGardensByDistance(currentPosition));
+      // TODO: hiç bahçe yoksa create garden'a yönlendirilmeli
     };
     fetchData();
   }, []);
@@ -31,7 +50,7 @@ const GardenNote = ({navigation}) => {
   }));
 
   const [selectedGarden, setSelectedGarden] = useState(gardenList[0]);
-  const [pickerValue, setPickerValue] = useState(gardenNames[0]);
+  const [gardenPickerValue, setGardenPickerValue] = useState(gardenNames[0]);
   const [gardenNote, setTextInputValue] = useState('');
 
   const [image, setSelectedImage] = useState(null);
@@ -103,9 +122,9 @@ const GardenNote = ({navigation}) => {
               dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
               dropdownIconColor={'#21212110'}
               style={{color: '#212121'}}
-              selectedValue={pickerValue}
+              selectedValue={gardenPickerValue}
               onValueChange={itemValue => {
-                setPickerValue(itemValue);
+                setGardenPickerValue(itemValue);
                 setSelectedGarden(
                   gardenList.find(garden => garden.id === itemValue),
                 );

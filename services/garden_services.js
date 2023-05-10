@@ -1,5 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import {getFromStorage} from './storage';
+import * as geolib from 'geolib';
+import { getSortedPlantsByDistance } from './plant_services';
 
 export const getUserGardens = async () => {
   const user_uid = await getFromStorage('userId');
@@ -88,9 +90,13 @@ export const getUserGardenIds = async () => {
   return gardenIds;
 };
 
+// kullanıcının bütün bahçelerindeki notları döndürür
 export const getGardenNotes = async () => {
   const gardenIds = await getUserGardenIds();
-
+  if(gardenIds.length == 0){
+    console.log("Empty garden id list.")
+    return []
+  }
   let gardensRef = await firestore()
     .collection('gardens')
     .where('id', 'in', gardenIds)
@@ -124,6 +130,35 @@ export const getGardenNotes = async () => {
   return notesWithGardenName;
 };
 
+// kullanıcının bir bahçesindeki notları döndürür
+export const getGardensNoteById = async (gardenId) => {
+  let gardenRef = await firestore()
+    .collection('gardens')
+    .doc(gardenId)
+    .get();
+  if(!gardenRef.exists){
+    return []
+  }
+  const gardenName = gardenRef.data().name
+  let gardenNotesRef = await firestore()
+    .collection('garden_notes')
+    .where('garden_id', '==', gardenId)
+    .orderBy('created_at', 'desc')
+    .get();
+
+  const garden_notes = gardenNotesRef.docs.map(doc => {
+    const data = doc.data();
+    data.created_at = String(data.created_at.toDate());
+    return data;
+  });
+
+  let notesWithGardenName = [];
+  garden_notes.forEach(note => {
+    note.garden_name = gardenName;
+    notesWithGardenName.push(note);
+  });
+  return notesWithGardenName;
+}
 // Ray Casting algorithm to determine whether a point is inside of given polygon
 export const isInsidePolygon = (point, polygon) => {
   let x = point.latitude,
@@ -148,43 +183,33 @@ export const insertGardenNote = async gardenNote => {
   await gardenNoteRf.update({id: gardenNoteRf.id});
 };
 
-//
-export const insertPlant = async plantData => {
-  const plantRef = firestore().collection('plants').doc();
-  await plantRef.set({
-    garden_id: plantData.garden_id,
-    id: plantRef.id,
-    location: plantData.location.map(
-      coordinate =>
-        new firestore.GeoPoint(coordinate.latitude, coordinate.longitude),
-    ),
-    ...plantData,
+export const getSortedGardensByDistance = async (userLocation) => {
+  const gardens = await getUserGardens()
+  let gardensWithoutPolygon = []
+  let gardensWithDistance = []
+  gardens.forEach(garden => {
+    polygon = garden.polygon.map(point => ({ latitude: point.latitude, longitude: point.longitude }));
+    if(polygon && polygon.length > 0){
+      const center = geolib.getCenter(polygon);
+      const distance = geolib.getDistance(center, userLocation, accuracy= 1);
+      garden.distance = distance
+      gardensWithDistance.push(garden)
+    }
+    else{
+      gardensWithoutPolygon.push(garden)
+    }
   });
-};
-//
-export const insertPlantNote = async plantNote => {
-  const plantNoteRf = await firestore()
-    .collection('plant_notes')
-    .add(plantNote);
-  await plantNoteRf.update({id: plantNoteRf.id});
-};
-
-//
-export const deletePlant = async plantId => {
-  const plantNoteRf = firestore()
-    .collection('plant_notes')
-    .where('plant_id', '==', plantId);
-
-  const querySnapshot = await plantNoteRf.get();
-  querySnapshot.forEach(async doc => {
-    console.log(doc)
-    await doc.ref.delete();
-  });
-
-  const plantRf = firestore()
-    .collection('plants')
-    .doc(plantId)
-
-  await plantRf.delete();
+  const sortedGardens = gardensWithDistance.sort((a, b) => b.distance - a.distance);
+  const concatenatedGardenList = sortedGardens.concat(gardensWithoutPolygon)
+  return concatenatedGardenList
 }
 
+// bahçelerin bitkileri de kullanıcının konumuna yakınlığına göre sıralanır
+export const getSortedGardensWithPlants = async (userLocation)=>{
+  const concatenatedGardenList = await getSortedGardensByDistance(userLocation)
+  let plantList = []
+  if(concatenatedGardenList.length > 0){
+    plantList = await getSortedPlantsByDistance(userLocation, concatenatedGardenList[0].id)
+  }
+  return {gardenList: concatenatedGardenList, plantList}
+}

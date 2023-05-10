@@ -34,7 +34,7 @@ const PlantGallery = () => {
     // TODO: show Modal
   }
   
-  if (isLoading) {
+  if (isLoading || plantNoteList.length == 0) {
     return (
       <View>
         {/* order options */}
@@ -80,8 +80,9 @@ const PlantGallery = () => {
               />
             </Picker>
           </View>
-        </View>
-        <Text style={{color: "#efefef", padding: 10}}>Loading...</Text>
+        </View>       
+      {isLoading && <Text style={{color: '#efefef', padding: 10}}>Loading...</Text>}
+      {!isLoading && plantNoteList.length == 0 && <Text style={{color: '#efefef', padding: 10}}>You do not have any plant note.</Text>}
       </View>
     );
   }

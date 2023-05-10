@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, Image } from "react-native"
+import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
 import React, { useEffect, useState } from 'react';
 import styles from "../styles/Style";
-import { getGardenNotes } from "../services/garden_services";
+import { getGardensNoteById } from "../services/garden_services";
 
 
 const ViewGarden = ({ navigation, route }) => {
@@ -11,7 +11,7 @@ const ViewGarden = ({ navigation, route }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const notes = await getGardenNotes()
+            const notes = await getGardensNoteById(garden.id)
             setGardenNotes(notes)
 
         };
@@ -34,29 +34,40 @@ const ViewGarden = ({ navigation, route }) => {
                     marginBottom: 150,
                 }}>
 
-                <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", paddingBottom: 10}}>
+                <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
                     <Text style={styles.text}>{garden.name}</Text>
                     <Image
                     style={{ width: 25, height: 25, alignSelf: "center"}}
-                    source={require("../images/icons/edit.png")}>
-
-                </Image>
-
+                    source={require("../images/icons/edit.png")}/>
                 </View>
 
+                <Text style={{fontSize: 16, marginBottom: 15, color: "#efefef"}}>
+                    <Text style={{fontWeight:"bold"}}>Garden Type: </Text> 
+                    {!garden.garden_type || garden.garden_type === "" ? "Undefined" : garden.garden_type}
+                </Text>
                 <Image
                     style={{ width: "100%", height: 250, marginBottom: 20, borderRadius: 10 }}
                     source={{ uri: garden_image }}>
 
                 </Image>
-                <Text style={{color: "white"}}>
-                    Garden Notes:
+                <Text style={{color: "white", fontSize: 16, textAlign: "center", fontWeight: "bold", marginBottom: 15}}>
+                    Garden Notes
                 </Text>
-                <View>
+                {gardenNotes.length == 0 &&
+                <Text style={{color: "#efefef", fontSize: 16, textAlign: "center"}}>This garden does not have any note.</Text>
+                }
+                <ScrollView>
                     {
-                        gardenNotes.map(note => <Text style={{color: "white"}}>{note.note}</Text>)
+                        gardenNotes.map(note => (
+                            <View key={note.id} style={{padding: 10, backgroundColor: "#ffffff20", borderRadius: 5, marginBottom: 5}}> 
+                                <Text style={{color: "white"}}>
+                                    <Text style={{fontWeight:"bold"}}>[{formatDate(note.created_at)}] </Text>
+                                    {note.note}</Text>
+                            </View>
+                            
+                        ))
                     }
-                </View>
+                </ScrollView>
 
                 <View
                     style={{ flexDirection: "row", justifyContent: "center"}}
@@ -88,4 +99,9 @@ const ViewGarden = ({ navigation, route }) => {
     );
 }
 
+const formatDate = (date) => {
+    if (date != null && date.split(' ').length > 3)
+      return date.split(' ').slice(1, 5).join(' ');
+    return date  
+  }
 export default ViewGarden

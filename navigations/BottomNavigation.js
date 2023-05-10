@@ -15,6 +15,8 @@ import Settings from "../pages/Settings";
 import ViewGarden from "../pages/ViewGarden";
 import Plants from "../pages/Plants";
 import CreatePlant from "../pages/CreatePlant";
+import AddPlantLocation from "../pages/AddPlantLocation";
+import PlantNote from "../layouts/add_note/PlantNote";
 
 
 const { width, height } = Dimensions.get("window")
@@ -174,6 +176,10 @@ const GardensStack = () => {
       <Stack.Screen
         name="DrawPolygon"
         component={DrawPolygon} />
+
+      <Stack.Screen
+        name="AddPlantLocation"
+        component={AddPlantLocation} />
     </Stack.Navigator>
   )
 }
@@ -186,6 +192,7 @@ const AddNoteStack = () => {
       }}>
       <Stack.Screen name="AddNote" component={AddNote} />
       <Stack.Screen name="SelectPlant" component={SelectPlant} />
+      <Stack.Screen name="PlantNote" component={PlantNote} />
     </Stack.Navigator>
   );
 }

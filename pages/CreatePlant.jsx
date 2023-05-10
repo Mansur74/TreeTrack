@@ -13,7 +13,7 @@ import styles from '../styles/Style';
 import React, { useState } from 'react';
 import PhotoPick from '../layouts/ImagePicker';
 import storage from "@react-native-firebase/storage"
-import { insertPlant } from '../services/garden_services';
+import { insertNewPlant } from '../services/plant_services';
 
 // fake data - TODO: retrieve from API
 const gardenTypeList = [
@@ -21,9 +21,9 @@ const gardenTypeList = [
 ];
 const CreatePlant = ({ route, navigation }) => {
   const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => { };
-  const location = route.params && route.params.coordinates ? route.params.coordinates : [];
-  const garden_id = route.params.garden.id;
-  const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
+  const plantLocation = route.params && route.params.coordinates ? route.params.coordinates : [];
+  const garden = route.params.garden
+  const [plantTypePickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
   const [plantName, setPlantName] = useState(null);
   const [plantNote, setPlantNote] = useState(null);
@@ -48,18 +48,20 @@ const CreatePlant = ({ route, navigation }) => {
     }
     const plantData = {
       name: plantName,
+      plant_type: plantTypePickerValue,
       created_at: new Date(),
-      garden_id: garden_id,
-      location: location,
+      garden_id: garden.id,
+      location: plantLocation,
       image_url: imageUrl
     };
+    // TODO: bitki notunu da kaydet? 
     try {
-      await insertPlant(plantData);
-      ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
+      await insertNewPlant(plantData);
+      ToastAndroid.show('Plant is added.', ToastAndroid.SHORT);
       onUpdate();
       navigation.navigate('Gardens');
     } catch (error) {
-      console.log("Insert garden error: ", error)
+      console.log("Insert plant error: ", error)
     }
 
   };
@@ -84,6 +86,7 @@ const CreatePlant = ({ route, navigation }) => {
       colors={['#89C6A7', '#89C6A7']}
       style={{ height: '100%' }}>
       <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
+      <Text style={{ fontSize: 20, color: "white", fontWeight: "bold", color: "#fff" }}> {'\u003E'}{garden.name} </Text>
         <Text style={styles.text}>add a new plant</Text>
 
         <ScrollView>
@@ -119,7 +122,7 @@ const CreatePlant = ({ route, navigation }) => {
                 dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
                 dropdownIconColor={'#21212110'}
                 style={{ color: '#212121' }}
-                selectedValue={pickerValue}
+                selectedValue={plantTypePickerValue}
                 onValueChange={itemValue => {
                   setPickerValue(itemValue);
                 }}>
@@ -143,7 +146,7 @@ const CreatePlant = ({ route, navigation }) => {
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  navigation.navigate('DrawPolygon', { onUpdate: onUpdate });
+                  navigation.navigate('AddPlantLocation', { garden, plantName, onUpdate });
                 }}>
                 <Image
                   source={{
@@ -157,7 +160,7 @@ const CreatePlant = ({ route, navigation }) => {
                   Open Map
                 </Text>
               </TouchableOpacity>
-              {location.length > 2 && (
+              {plantLocation.length > 2 && (
                 <Image
                   source={{
                     uri: 'https://cdn-icons-png.flaticon.com/32/8968/8968523.png',

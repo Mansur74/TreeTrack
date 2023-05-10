@@ -42,7 +42,7 @@ const GardenGallery = () => {
     // TODO: show Modal
 
   };
-if (isLoading) {
+if (isLoading || gardenNoteList.length == 0) {
   return (
     <View>
       {/* order options */}
@@ -87,7 +87,8 @@ if (isLoading) {
           </Picker>
         </View>
       </View>
-      <Text style={{color: '#efefef', padding: 10}}>Loading...</Text>
+      {isLoading && <Text style={{color: '#efefef', padding: 10}}>Loading...</Text>}
+      {!isLoading && gardenNoteList.length == 0 && <Text style={{color: '#efefef', padding: 10}}>You do not have any garden note.</Text>}
     </View>
   );
 }

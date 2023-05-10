@@ -10,7 +10,7 @@ import MapView, {
   Marker,
   Polyline,
 } from 'react-native-maps';
-import {getClosestGarden, getUserGardens} from '../services/garden_services';
+import {getUserGardens} from '../services/garden_services';
 
 const Map = () => {
   const [selectedMapType, setMapType] = useState('standard');
@@ -70,7 +70,6 @@ const Map = () => {
     fetchData();
   }, []);
 
-	console.log("[map] gardens: ", gardens)
   return (
     // TODO: konuma en yakın bahçeleri poligon olarak göster.
     <LinearGradient
@@ -85,8 +84,10 @@ const Map = () => {
             backgroundColor: '#ffffff95',
             borderRadius: 5,
             marginBottom: 5,
+            color: "#212121"
           }}
           placeholder="Search address"
+          placeholderTextColor={"#21212190"}
           value={searchText}
           onChangeText={setSearchText}
           onSubmitEditing={handleSearch}
@@ -155,21 +156,6 @@ const Map = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() =>
-            getClosestGarden({
-              latitude: 39.918689180427975,
-              longitude: 32.85356783839511,
-            })
-          }
-          style={{
-            backgroundColor: '#09A555',
-            paddingHorizontal: 32,
-            paddingVertical: 5,
-            borderRadius: 5,
-          }}>
-          <Text style={{color: 'white'}}>Closest Garden</Text>
-        </TouchableOpacity>
       </View>
     </LinearGradient>
   );

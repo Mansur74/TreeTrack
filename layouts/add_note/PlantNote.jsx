@@ -10,29 +10,46 @@ import styles from '../../styles/Style';
 import React, {useState, useEffect} from 'react';
 import PhotoPick from '../ImagePicker';
 import {Picker} from '@react-native-picker/picker';
-import { getUserGardens } from '../../services/garden_services';
-
+import {getSortedGardensByDistance} from '../../services/garden_services';
+import Geolocation from '@react-native-community/geolocation';
 
 const PlantNote = ({navigation}) => {
   const [gardenList, setGardenList] = useState([]);
-
+  // varsayılan konum Ankara
+  const [currentPosition, setPosition] = useState({
+    latitude: 39.941155726554385,
+    longitude: 32.85929029670567,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+  useEffect(() => {
+    Geolocation.getCurrentPosition(pos => {
+      const crd = pos.coords;
+      setPosition({
+        latitude: crd.latitude,
+        longitude: crd.longitude,
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+      });
+    });
+  }, []);
+  // bahçeler kullanıcının konumuna olan yakınlığına göre sıralanır
   useEffect(() => {
     const fetchData = async () => {
-      setGardenList(await getUserGardens());
+      setGardenList(await getSortedGardensByDistance(currentPosition));
+      // TODO: hiç bahçe yoksa create garden'a yönlendirilmeli
     };
     fetchData();
   }, []);
 
-  {/* TODO: kullanıcıya en yakın olan bahçelere göre bu liste sıralanmalı */}
   let gardenNames = gardenList.map(garden => ({
     id: garden.id,
     gardenName: garden.name,
   }));
 
   const [selectedGarden, setSelectedGarden] = useState(gardenList[0]);
-  const [pickerValue, setPickerValue] = useState(gardenNames[0]);
-  const [plantNote, setTextInputValue] = useState('');
-
+  const [gardenPickerValue, setGardenPickerValue] = useState(gardenNames[0]);
+  const [plantNote, setPlantNote] = useState('');
   const [imagePath, setSelectedImage] = useState(null);
   const onSelectImage = image => {
     if (!image) {
@@ -57,9 +74,9 @@ const PlantNote = ({navigation}) => {
               dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
               dropdownIconColor={'#21212110'}
               style={{color: '#212121'}}
-              selectedValue={pickerValue}
+              selectedValue={gardenPickerValue}
               onValueChange={itemValue => {
-                setPickerValue(itemValue);
+                setGardenPickerValue(itemValue);
                 setSelectedGarden(
                   gardenList.find(garden => garden.id === itemValue),
                 );
@@ -77,7 +94,7 @@ const PlantNote = ({navigation}) => {
           <Text style={styles.t4}>Enter your notes</Text>
           <TextInput
             value={plantNote}
-            onChangeText={text => setTextInputValue(text)}
+            onChangeText={text => setPlantNote(text)}
             multiline
             numberOfLines={5}
             placeholder="Plant notes..."

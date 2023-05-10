@@ -26,7 +26,7 @@ const gardenTypeList = [
 const CreateGarden = ({ route, navigation }) => {
   const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
   const polygon = route.params && route.params.coordinates ? route.params.coordinates : [];
-  const [pickerValue, setPickerValue] = useState(gardenTypeList[0].name);
+  const [gardenTypePickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
   const [gardenName, setGardenName] = useState(null);
   const [gardenNote, setGardenNote] = useState(null);
@@ -54,8 +54,10 @@ const CreateGarden = ({ route, navigation }) => {
       name: gardenName,
       created_at: new Date(),
       polygon: polygon,
-      image_url: imageUrl
+      image_url: imageUrl,
+      garden_type: gardenTypePickerValue
     };
+    // TODO: bahçe notunu da kaydet? 
     try {
       await insertGarden(gardenData);
       ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
@@ -122,7 +124,7 @@ const CreateGarden = ({ route, navigation }) => {
                 dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
                 dropdownIconColor={'#21212110'}
                 style={{ color: '#212121' }}
-                selectedValue={pickerValue}
+                selectedValue={gardenTypePickerValue}
                 onValueChange={itemValue => {
                   setPickerValue(itemValue);
                 }}>
