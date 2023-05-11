@@ -17,6 +17,7 @@ import Plants from "../pages/Plants";
 import CreatePlant from "../pages/CreatePlant";
 import AddPlantLocation from "../pages/AddPlantLocation";
 import PlantNote from "../layouts/add_note/PlantNote";
+import ViewPlant from "../pages/ViewPlant";
 
 
 const { width, height } = Dimensions.get("window")
@@ -172,6 +173,10 @@ const GardensStack = () => {
       <Stack.Screen
         name="CreatePlant"
         component={CreatePlant} />
+
+      <Stack.Screen
+        name="ViewPlant"
+        component={ViewPlant} />
 
       <Stack.Screen
         name="DrawPolygon"

@@ -43,6 +43,31 @@ export const getPlantNotes = async () => {
   return notesWithPlantName;
 };
 
+export const getPlantNotesById = async (plantId) => {
+  let plantRef = await firestore().collection('plants').doc(plantId).get();
+  if(!plantRef.exists){
+    return []
+  }
+  const plantName = plantRef.data().name
+  let plantNoteRefs = await firestore()
+    .collection('plant_notes')
+    .where('plant_id', '==', plantId)
+    .orderBy('created_at', 'desc')
+    .get();
+  const plant_notes = plantNoteRefs.docs.map(doc => {
+    const data = doc.data();
+    data.created_at = String(data.created_at.toDate());
+    return data;
+  });
+
+  let notesWithPlantName = [];
+  plant_notes.forEach(note => {
+    note.plant_name = plantName;
+    notesWithPlantName.push(note);
+  });
+  return notesWithPlantName;
+};
+
 export const insertNewPlant = async newPlant => {
   const ref = firestore().collection('plants').doc();
   await ref.set({

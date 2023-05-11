@@ -19,7 +19,7 @@ const PlantCard = ({ navigation, plant, onUpdate }) => {
 			? 'https://cdn-icons-png.flaticon.com/512/3039/3039008.png'
 			: plant.image_url;
 	return (
-		<TouchableOpacity>
+		<TouchableOpacity onPress={()=>{navigation.navigate("ViewPlant", {plant: plant})}}>
 			<View
 				style={{
 					flexDirection: 'row',

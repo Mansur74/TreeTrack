@@ -27,7 +27,6 @@ export const getUserGardens = async () => {
   return gardenList;
 };
 
-// todo: garden'a ait bitkiler, resimler ve notlar da silinmeli
 export const deleteGarden = async gardenId => {
   // remove garden
   const gardenRef = firestore().collection('gardens').doc(gardenId);
@@ -42,6 +41,36 @@ export const deleteGarden = async gardenId => {
   querySnapshot.forEach(async doc => {
     await doc.ref.delete();
   });
+  // remove garden notes
+  let gardenNotesRef = await firestore()
+    .collection('garden_notes')
+    .where('garden_id', '==', gardenId)
+    .get();
+  gardenNotesRef.docs.map(async doc => {
+    await doc.ref.delete()
+  });
+  console.log("GARDEN NOTES REMOVED")
+  // remove plants
+  const plant_id_list = []
+  const plantsRef = firestore()
+    .collection('plants')
+    .where('garden_id', '==', gardenId);
+  const plantQuerySnapshot = await plantsRef.get();
+  plantQuerySnapshot.forEach(async doc => {
+    const plant = doc.data()
+    plant_id_list.push(plant.id)
+    await doc.ref.delete();
+  });
+  console.log("PLANTS REMOVED")
+  // remove plant notes
+  let plantNotesRef = await firestore()
+    .collection('plant_notes')
+    .where('plant_id', 'in', plant_id_list)
+    .get();
+  plantNotesRef.docs.map(async doc => {
+    await doc.ref.delete()
+  });
+  console.log("PLANT NOTES REMOVED")
 };
 
 export const insertGarden = async gardenData => {
