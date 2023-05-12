@@ -27,6 +27,24 @@ export const getUserGardens = async () => {
   return gardenList;
 };
 
+export const getUserGardenNames = async () =>{
+  const user_uid = await getFromStorage('userId');
+  const userGardensRef = firestore().collection('user_gardens');
+  const query = userGardensRef.where('user_uid', '==', user_uid);
+  const userGardensDocs = await query.get();
+
+  const gardenPromises = userGardensDocs.docs.map(async userGardenDoc => {
+    const garden_id = userGardenDoc.data().garden_uid;
+    const gardenRef = firestore().collection('gardens').doc(garden_id);
+    const gardenDoc = await gardenRef.get();
+    const data = gardenDoc.data();
+    return {name: data.name, id: data.id, garden_id};
+  });
+  const gardenList = await Promise.all(gardenPromises);
+  gardenList.sort();
+  return gardenList;
+}
+
 export const deleteGarden = async gardenId => {
   // remove garden
   const gardenRef = firestore().collection('gardens').doc(gardenId);

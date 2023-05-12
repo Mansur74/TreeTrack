@@ -1,6 +1,6 @@
 import { Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu"
-import { deletePlant } from "../services/garden_services";
+import { deletePlant } from "../services/plant_services";
 
 // delete garden -> bu islemin digerleri gibi child componentlarda olması lazım
 const handleDelete = async (plantId, onUpdate) => {

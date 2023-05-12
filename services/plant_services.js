@@ -19,7 +19,10 @@ export const getPlantNotes = async () => {
     plantIds.push(data.id);
     return data;
   });
-
+  if(plantIds.length == 0){
+    console.log("Empty plant id list.")
+    return []
+  }
   let plantNoteRefs = await firestore()
     .collection('plant_notes')
     .where('plant_id', 'in', plantIds)
