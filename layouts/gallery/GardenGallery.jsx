@@ -10,13 +10,8 @@ import {Picker} from '@react-native-picker/picker';
 import React, {useState, useEffect} from 'react';
 import styles from "../../styles/Style";
 import { getGardenNotes, getUserGardenNames } from '../../services/garden_services';
+import { formatDate, sortNoteList } from '../../services/helper';
 
-
-const formatDate = (date) => {
-  if (date != null && date.split(' ').length > 3)
-    return date.split(' ').slice(0, 4).join(' ');
-  return date  
-}
 const GardenGallery = () => {
   const [gardenNoteList, setNoteList] = useState([]);
   const [filteredNoteList, setFilteredNoteList] = useState([]);
@@ -73,20 +68,7 @@ const GardenGallery = () => {
 
   const onSortOptionChange = (itemValue) => {
     setSortOptionPicker(itemValue)
-    let sortedNotes = [...filteredNoteList]
-    switch (itemValue) {
-      case 1:
-        sortedNotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        break;
-      case 2:
-        sortedNotes.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-        break;
-      case 3:
-        sortedNotes.sort((a, b) => b.name - a.name)
-        break;
-      default:
-        break;
-    }
+    let sortedNotes = sortNoteList(filteredNoteList, itemValue, 'garden')
     setFilteredNoteList(sortedNotes)
   }
 

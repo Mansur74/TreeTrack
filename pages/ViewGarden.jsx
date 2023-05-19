@@ -3,7 +3,7 @@ import LinearGradient from "react-native-linear-gradient";
 import React, { useEffect, useState } from 'react';
 import styles from "../styles/Style";
 import { getGardensNoteById } from "../services/garden_services";
-
+import { formatDate } from "../services/helper";
 
 const ViewGarden = ({ navigation, route }) => {
     const garden = route.params.garden;
@@ -99,9 +99,4 @@ const ViewGarden = ({ navigation, route }) => {
     );
 }
 
-const formatDate = (date) => {
-    if (date != null && date.split(' ').length > 3)
-      return date.split(' ').slice(1, 5).join(' ');
-    return date  
-  }
 export default ViewGarden

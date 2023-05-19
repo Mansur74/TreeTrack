@@ -13,13 +13,13 @@ const handleDelete = async (plantId, onUpdate) => {
 	}
 }
 
-const PlantCard = ({ navigation, plant, onUpdate }) => {
+const PlantCard = ({ navigation, plant, garden, onUpdate }) => {
 	const plant_image =
 		!plant.image_url
 			? 'https://cdn-icons-png.flaticon.com/512/3039/3039008.png'
 			: plant.image_url;
 	return (
-		<TouchableOpacity onPress={()=>{navigation.navigate("ViewPlant", {plant: plant})}}>
+		<TouchableOpacity onPress={()=>{navigation.navigate("ViewPlant", {plant, garden, onUpdate})}}>
 			<View
 				style={{
 					flexDirection: 'row',
@@ -66,7 +66,7 @@ const PlantCard = ({ navigation, plant, onUpdate }) => {
 									borderRadius: 5,
 								}}>
 								<View style={{ borderColor: '#888888', borderWidth: 1 }}>
-									<MenuOption onSelect={() => alert(`Edit`)}>
+									<MenuOption onSelect={() => navigation.navigate("EditPlant", {plant, garden, onUpdate})}>
 										<Text style={{ textAlign: 'center', color: '#212121' }}>
 											Edit
 										</Text>

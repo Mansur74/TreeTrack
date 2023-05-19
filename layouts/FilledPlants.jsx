@@ -46,7 +46,7 @@ const FilledPlants = ({ navigation, garden, plants, onUpdate }) => {
 			
 								{
 									plants.map(plant =>
-										<PlantCard navigation={navigation} key={plant.name} plant={plant} onUpdate={onUpdate} />
+										<PlantCard navigation={navigation} key={plant.name} plant={plant} garden={garden} onUpdate={onUpdate} />
 									)
 								}
 							</MenuProvider>

@@ -2,21 +2,24 @@ import firestore from '@react-native-firebase/firestore';
 import { getPlantsOfGarden, getUserGardenIds } from './garden_services';
 import * as geolib from 'geolib';
 
-export const getPlantNotes = async () => {
+export const getPlantNotes = async (withPlantNames = false) => {
   const gardenIds = await getUserGardenIds();
   if(gardenIds.length == 0){
     console.log("Empty garden id list.")
     return []
   }
   const plantIds = [];
+  const plantInfoList = []
   let plantsRef = await firestore()
     .collection('plants')
     .where('garden_id', 'in', gardenIds)
     .get();
   const plants = plantsRef.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     plantIds.push(data.id);
+    if(withPlantNames)
+      plantInfoList.push({id: data.id, name: data.name, plant_type: data.plant_type})
     return data;
   });
   if(plantIds.length == 0){
@@ -30,7 +33,7 @@ export const getPlantNotes = async () => {
     .get();
   const plant_notes = plantNoteRefs.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
 
@@ -42,7 +45,9 @@ export const getPlantNotes = async () => {
       notesWithPlantName.push(note);
     }
   });
-
+  if(withPlantNames){
+    return {notes: notesWithPlantName, plantInfo: plantInfoList}
+  }
   return notesWithPlantName;
 };
 
@@ -59,7 +64,7 @@ export const getPlantNotesById = async (plantId) => {
     .get();
   const plant_notes = plantNoteRefs.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
 
@@ -144,4 +149,8 @@ export const getClosestPlant = async (userLocation, gardenId) => {
     }
   });
   return closestPlant
+}
+
+export const updatePlant = async (plantId, newPlantData) => {
+  await firestore().collection('plants').doc(plantId).update(newPlantData);
 }

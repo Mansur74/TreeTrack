@@ -3,28 +3,38 @@ import {Picker} from '@react-native-picker/picker';
 import React, {useState, useEffect} from 'react';
 import styles from '../../styles/Style';
 import { getPlantNotes } from '../../services/plant_services';
-
-
-const formatDate = date => {
-  if (date != null && date.split(' ').length > 3)
-    return date.split(' ').slice(0, 4).join(' ');
-  return date;
-};
+import { formatDate, sortNoteList } from '../../services/helper';
+import { getUserGardenNames } from '../../services/garden_services';
 
 const PlantGallery = () => {
   const [plantNoteList, setNoteList] = useState([]);
+  const [filteredNoteList, setFilteredNoteList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedItem, setPressedItem] = useState({});
+  const [plantNames, setPlantNames] = useState([])
+  const [gardenNames, setGardenNames] = useState([]) // Todo: filter by garden, plant type ?
   
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const plantNotes = await getPlantNotes()
-      setNoteList(plantNotes);
+      const plantNotesWithInfo = await getPlantNotes(true)
+      setNoteList(plantNotesWithInfo.notes);
+      setFilteredNoteList(plantNotesWithInfo.notes)
+      setPlantNames(plantNotesWithInfo.plantInfo)
       setIsLoading(false);
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      const gardenNames = await getUserGardenNames()
+      setGardenNames(gardenNames)
+      setIsLoading(false)
+    }
+    fetchData()
   }, []);
   
   const displayNote = (item) => {
@@ -33,8 +43,27 @@ const PlantGallery = () => {
     console.log("Plant note: ", pressedItem)
     // TODO: show Modal
   }
+  const sortOptions = [{name: "Newest to Oldest", id: 1}
+                      ,{name: "Oldest to Newest", id: 2}
+                      ,{name: "Plant Names", id: 3}]
+  const [sortOptionPickerValue, setSortOptionPicker] = useState(sortOptions[0])
+  const onSortOptionChange = (itemValue) => {
+    setSortOptionPicker(itemValue)
+    let sortedNotes = sortNoteList(filteredNoteList, itemValue, 'plant')
+    setFilteredNoteList(sortedNotes)
+  }
+  const filterOptions = [{name: "All Plants", id: 1}, ...plantNames]
+  const [filterOptionPickerValue, setFilterOptionPicker] = useState(filterOptions[0])
   
-  if (isLoading || plantNoteList.length == 0) {
+  const onFilterPickerChange = (itemValue) => {
+    setFilterOptionPicker(itemValue);
+    if(itemValue === 1){
+      setFilteredNoteList(plantNoteList)
+    }else{
+      setFilteredNoteList(plantNoteList.filter(note => {return note.plant_id == itemValue}))
+    }
+  }
+  if (isLoading || filteredNoteList.length == 0) {
     return (
       <View>
         {/* order options */}
@@ -53,12 +82,19 @@ const PlantGallery = () => {
               backgroundColor: '#fff',
               justifyContent: 'center',
             }}>
-            <Picker style={{color: '#212121'}} selectedValue={'All Gardens'}>
-              <Picker.Item
-                key={'All Plants'}
-                label={'All Plants'}
-                value={'All Plants'}
-              />
+            <Picker
+              dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
+              dropdownIconColor={'#21212110'}
+              style={{color: '#212121'}}
+              selectedValue={filterOptionPickerValue}
+              onValueChange={itemValue => onFilterPickerChange(itemValue)}>
+              {filterOptions.map(filter => (
+                <Picker.Item
+                  key={filter.id}
+                  label={filter.name}
+                  value={filter.id}
+                />
+              ))}
             </Picker>
           </View>
 
@@ -70,19 +106,19 @@ const PlantGallery = () => {
               backgroundColor: '#fff',
               justifyContent: 'center',
             }}>
-            <Picker
-              style={{color: '#212121'}}
-              selectedValue={'Newest to Oldest'}>
+            <Picker style={{color: '#212121'}} selectedValue={sortOptionPickerValue}>
+            {sortOptions.map(sort => (
               <Picker.Item
-                key={'Newest to Oldest'}
-                label={'Newest to Oldest'}
-                value={'Newest to Oldest'}
+                key={sort.id}
+                label={sort.name}
+                value={sort.id}
               />
+            ))}
             </Picker>
           </View>
         </View>       
       {isLoading && <Text style={{color: '#efefef', padding: 10}}>Loading...</Text>}
-      {!isLoading && plantNoteList.length == 0 && <Text style={{color: '#efefef', padding: 10}}>You do not have any plant note.</Text>}
+      {!isLoading && filteredNoteList.length == 0 && <Text style={{color: '#efefef', padding: 10}}>You do not have any plant note.</Text>}
       </View>
     );
   }
@@ -104,13 +140,20 @@ const PlantGallery = () => {
             backgroundColor: '#fff',
             justifyContent: 'center',
           }}>
-          <Picker style={{color: '#212121'}} selectedValue={'All Gardens'}>
-            <Picker.Item
-              key={'All Plants'}
-              label={'All Plants'}
-              value={'All Plants'}
-            />
-          </Picker>
+          <Picker
+              dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
+              dropdownIconColor={'#21212110'}
+              style={{color: '#212121'}}
+              selectedValue={filterOptionPickerValue}
+              onValueChange={itemValue => onFilterPickerChange(itemValue)}>
+              {filterOptions.map(filter => (
+                <Picker.Item
+                  key={filter.id}
+                  label={filter.name}
+                  value={filter.id}
+                />
+              ))}
+            </Picker>
         </View>
 
         <View
@@ -121,12 +164,16 @@ const PlantGallery = () => {
             backgroundColor: '#fff',
             justifyContent: 'center',
           }}>
-          <Picker style={{color: '#212121'}} selectedValue={'Newest to Oldest'}>
-            <Picker.Item
-              key={'Newest to Oldest'}
-              label={'Newest to Oldest'}
-              value={'Newest to Oldest'}
-            />
+          <Picker style={{color: '#212121'}} 
+            selectedValue={sortOptionPickerValue}
+            onValueChange={itemValue => onSortOptionChange(itemValue)}>
+            {sortOptions.map(sort => (
+              <Picker.Item
+                key={sort.id}
+                label={sort.name}
+                value={sort.id}
+              />
+            ))}
           </Picker>
         </View>
       </View>
@@ -139,7 +186,7 @@ const PlantGallery = () => {
             alignContent: 'flex-start',
             marginBottom: 150,
           }}>
-          {plantNoteList.map(item => (
+          {filteredNoteList.map(item => (
             <TouchableOpacity
               style={{
                 width: '47%',

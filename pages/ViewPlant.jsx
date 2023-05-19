@@ -3,10 +3,12 @@ import LinearGradient from "react-native-linear-gradient";
 import React, { useEffect, useState } from 'react';
 import styles from "../styles/Style";
 import { getPlantNotesById } from "../services/plant_services";
-
+import { formatDate } from "../services/helper";
 
 const ViewGarden = ({ navigation, route }) => {
     const plant = route.params.plant;
+    const garden = route.params.garden;
+    const onUpdate = route.params.onUpdate;
     const [plantNotes, setPlantNotes] = useState([]);
 
     useEffect(() => {
@@ -35,9 +37,12 @@ const ViewGarden = ({ navigation, route }) => {
 
                 <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
                     <Text style={styles.text}>{plant.name}</Text>
-                    <Image
-                    style={{ width: 25, height: 25, alignSelf: "center"}}
-                    source={require("../images/icons/edit.png")}/>
+                    <TouchableOpacity style={{alignSelf: "center" }} onPress={()=>{
+                        navigation.navigate("EditPlant", {plant, garden, onUpdate})}}>
+                        <Image
+                            style={{ width: 25, height: 25}}
+                            source={require("../images/icons/edit.png")} />
+                    </TouchableOpacity>
                 </View>
 
                 <Text style={{fontSize: 16, marginBottom: 15, color: "#efefef"}}>
@@ -84,9 +89,4 @@ const ViewGarden = ({ navigation, route }) => {
     );
 }
 
-const formatDate = (date) => {
-    if (date != null && date.split(' ').length > 3)
-      return date.split(' ').slice(1, 5).join(' ');
-    return date  
-  }
 export default ViewGarden

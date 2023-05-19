@@ -16,7 +16,7 @@ export const getUserGardens = async () => {
     const gardenRef = firestore().collection('gardens').doc(garden_id);
     const gardenDoc = await gardenRef.get();
     const data = gardenDoc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     data.polygon = data.polygon.flat();
     return data;
   });
@@ -38,7 +38,7 @@ export const getUserGardenNames = async () =>{
     const gardenRef = firestore().collection('gardens').doc(garden_id);
     const gardenDoc = await gardenRef.get();
     const data = gardenDoc.data();
-    return {name: data.name, id: data.id, garden_id};
+    return {name: data.name, id: data.id};
   });
   const gardenList = await Promise.all(gardenPromises);
   gardenList.sort();
@@ -117,7 +117,7 @@ export const getPlantsOfGarden = async garden_id => {
     .get();
   const plantList = querySnapshot.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
   // console.log("Plant list: ", plantList)
@@ -151,7 +151,7 @@ export const getGardenNotes = async () => {
 
   const gardens = gardensRef.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
 
@@ -162,7 +162,7 @@ export const getGardenNotes = async () => {
     .get();
   const garden_notes = gardenNotesRef.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
 
@@ -195,7 +195,7 @@ export const getGardensNoteById = async (gardenId) => {
 
   const garden_notes = gardenNotesRef.docs.map(doc => {
     const data = doc.data();
-    data.created_at = String(data.created_at.toDate());
+    //data.created_at = String(data.created_at.toDate());
     return data;
   });
 
