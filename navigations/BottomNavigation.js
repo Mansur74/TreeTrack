@@ -20,6 +20,8 @@ import PlantNote from "../layouts/add_note/PlantNote";
 import ViewPlant from "../pages/ViewPlant";
 import EditPlant from "../pages/EditPlant";
 import EditPlantLocation from "../pages/EditPlantLocation";
+import EditGarden from "../pages/EditGarden";
+import EditGardenPolygon from "../pages/EditGardenPolygon";
 
 
 const { width, height } = Dimensions.get("window")
@@ -193,6 +195,12 @@ const GardensStack = () => {
       <Stack.Screen
         name="EditPlantLocation"
         component={EditPlantLocation} />
+      <Stack.Screen
+        name="EditGarden"
+        component={EditGarden} />
+      <Stack.Screen
+        name="EditGardenPolygon"
+        component={EditGardenPolygon} />
     </Stack.Navigator>
   )
 }

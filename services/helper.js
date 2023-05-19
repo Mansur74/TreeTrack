@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 export const formatDate = (date) => {
     if (date) {
         date = String(date.toDate());
@@ -25,4 +27,22 @@ export const sortNoteList = (noteList, sortOption, noteType) => {
             break;
     }
     return noteList
+}
+
+// bir bahçe haritada gösterileceği zaman haritanın initialPosition'ı bu alana göre hesaplanır
+export const setMapPositionByGardenArea = (polygon) =>{
+    const {width, height} = Dimensions.get('window');
+    const aspectRatio = width / height;
+
+    const minLatitude = Math.min(...polygon.map(p => p.latitude));
+    const maxLatitude = Math.max(...polygon.map(p => p.latitude));
+    const minLongitude = Math.min(...polygon.map(p => p.longitude));
+    const maxLongitude = Math.max(...polygon.map(p => p.longitude));
+
+    const latitude = (minLatitude + maxLatitude) / 2;
+    const longitude = (minLongitude + maxLongitude) / 2;
+    const latitudeDelta = maxLatitude - minLatitude;
+    const longitudeDelta = (maxLongitude - minLongitude) * aspectRatio;
+
+    return {latitude, longitude, latitudeDelta, longitudeDelta};
 }

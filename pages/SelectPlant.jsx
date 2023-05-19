@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Dimensions, ToastAndroid, Modal, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ToastAndroid, Modal, Alert, TextInput, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
@@ -9,6 +9,7 @@ import {useRoute} from '@react-navigation/native';
 import storage from "@react-native-firebase/storage"
 import { getPlantsOfGarden, isInsidePolygon } from '../services/garden_services';
 import { insertNewPlant, insertPlantNote } from '../services/plant_services';
+import { setMapPositionByGardenArea } from '../services/helper';
 
 const plantTypes = [
   {
@@ -143,20 +144,7 @@ const SelectPlant = ({navigation}) => {
   const polygon = selectedGarden.polygon;
   let region = currentPosition;
   if (polygon.length > 2) {
-    const {width, height} = Dimensions.get('window');
-    const aspectRatio = width / height;
-
-    const minLatitude = Math.min(...polygon.map(p => p.latitude));
-    const maxLatitude = Math.max(...polygon.map(p => p.latitude));
-    const minLongitude = Math.min(...polygon.map(p => p.longitude));
-    const maxLongitude = Math.max(...polygon.map(p => p.longitude));
-
-    const latitude = (minLatitude + maxLatitude) / 2;
-    const longitude = (minLongitude + maxLongitude) / 2;
-    const latitudeDelta = maxLatitude - minLatitude;
-    const longitudeDelta = (maxLongitude - minLongitude) * aspectRatio;
-
-    region = {latitude, longitude, latitudeDelta, longitudeDelta};
+    region = setMapPositionByGardenArea(polygon);
   }
   else{
     ToastAndroid.show("This garden's area is not declared.", ToastAndroid.SHORT)
@@ -256,16 +244,27 @@ const SelectPlant = ({navigation}) => {
                   latitude: plant.location.latitude,
                   longitude: plant.location.longitude,
                 }}
-                icon={{
-                  uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png', // https://cdn-icons-png.flaticon.com/64/7561/7561338.png
-                  width: 64,
-                  height: 64,
-                }}
                 onPress={() => {
                   setSelectedPlant(plant);
                 }}
-                style={{alignItems: 'center', justifyContent: 'center'}}
-                title={plant.name}></Marker>
+                style={{alignItems: 'center', justifyContent: 'center'}}>
+                <Text 
+                  style={{ color: 'black', backgroundColor: '#efefef',
+                           opacity: selectedPlant && plant.id === selectedPlant.id ? 1 : 0.5 }}>
+                  {plant.name}
+                </Text>
+                <Image
+                  source={{
+                    uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png',
+                  }}
+                  resizeMode="stretch"
+                  style={{
+                    height: 25,
+                    width: 25,
+                    opacity: selectedPlant && plant.id === selectedPlant.id ? 1 : 0.4,
+                  }}
+                />
+              </Marker>
             ))}
           </MapView>
           <View

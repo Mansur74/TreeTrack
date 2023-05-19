@@ -260,3 +260,7 @@ export const getSortedGardensWithPlants = async (userLocation)=>{
   }
   return {gardenList: concatenatedGardenList, plantList}
 }
+
+export const updateGarden = async (gardenId, newGardenData) => {
+  await firestore().collection('gardens').doc(gardenId).update(newGardenData);
+}

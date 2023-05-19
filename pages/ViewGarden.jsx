@@ -7,6 +7,7 @@ import { formatDate } from "../services/helper";
 
 const ViewGarden = ({ navigation, route }) => {
     const garden = route.params.garden;
+    const onUpdate = route.params.onUpdate;
     const [gardenNotes, setGardenNotes] = useState([]);
 
     useEffect(() => {
@@ -36,9 +37,12 @@ const ViewGarden = ({ navigation, route }) => {
 
                 <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
                     <Text style={styles.text}>{garden.name}</Text>
-                    <Image
-                    style={{ width: 25, height: 25, alignSelf: "center"}}
-                    source={require("../images/icons/edit.png")}/>
+                    <TouchableOpacity style={{alignSelf: "center" }} onPress={()=>{
+                        navigation.navigate("EditGarden", {garden, onUpdate})}}>
+                        <Image
+                            style={{ width: 25, height: 25}}
+                            source={require("../images/icons/edit.png")} />
+                    </TouchableOpacity>
                 </View>
 
                 <Text style={{fontSize: 16, marginBottom: 15, color: "#efefef"}}>

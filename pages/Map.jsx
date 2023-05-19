@@ -110,6 +110,7 @@ const Map = () => {
                 fillColor="rgba(167, 255, 200, 0.31)"
               />
             ))}
+            {/* TODO: Show plants of each garden. */}
           </MapView>
         </View>
         <View

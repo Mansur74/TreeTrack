@@ -11,31 +11,32 @@ import LinearGradient from 'react-native-linear-gradient';
 import React, { useState } from 'react';
 import styles from '../styles/Style';
 import { useRoute } from '@react-navigation/native';
-import { updatePlant } from '../services/plant_services';
+import { updateGarden } from '../services/garden_services';
 
-const EditPlant = ({ navigation }) => {
+const EditGarden = ({ navigation }) => {
     const route = useRoute();
-    const plant = route.params.plant;
     const garden = route.params.garden;
     const onUpdate = route.params.onUpdate;
-    const plantNewLocation = route.params && route.params.new_coordinates ? route.params.new_coordinates : {};
-
-    const [plantNote, setTextInputValue] = useState('');
-    const [plantName, setPlantNameValue] = useState(plant.name);
+    const newGardenArea = route.params && route.params.polygon ? route.params.polygon : [];
+    
+    const [gardenNote, setTextInputValue] = useState('');
+    const [gardenName, setGardenName] = useState(garden.name);
 
     const handleUpdatePlant = async () => {
-        const updated_plant = plant
-        if(Object.keys(plantNewLocation).length === 2)
-            updated_plant.location = plantNewLocation
-        if(plantName.length > 0)
-            updated_plant.name = plantName
-        try {
-            await updatePlant(plant.id, updated_plant)
-            ToastAndroid.show("Plant is updated.", ToastAndroid.SHORT)
-        } catch (error) {
-            console.log("Error update plant: ", error)
+        const updated_garden = garden
+        if(newGardenArea.length > 2){
+            updated_garden.polygon = newGardenArea
         }
-        
+        if(gardenName.length > 0){
+            updated_garden.name = gardenName
+        }
+        try {
+            await updateGarden(garden.id, updated_garden)
+            ToastAndroid.show("Garden is updated.", ToastAndroid.SHORT)
+            // TODO: Navigate?
+        } catch (error) {
+            console.log("Error garden update: ", error)
+        }
     };
     return (
         <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{ height: '100%' }}>
@@ -47,17 +48,17 @@ const EditPlant = ({ navigation }) => {
                 }}>
                 <ScrollView>
                     <View style={{ marginBottom: 90 }}>
-                        <Text style={styles.subtext}> &gt; {plant.name}</Text>
-                        <Text style={styles.text}>edit plant</Text>
-                        <Text style={styles.t4}>Edit plant name</Text>
+                        <Text style={styles.subtext}> &gt; {garden.name}</Text>
+                        <Text style={styles.text}>edit garden</Text>
+                        <Text style={styles.t4}>Edit garden name</Text>
                         <TextInput
-                            value={plantName}
-                            onChangeText={text => setPlantNameValue(text)}
-                            placeholder={plant.name}
+                            value={gardenName}
+                            onChangeText={text => setGardenName(text)}
+                            placeholder={garden.name}
                             placeholderTextColor={'#21212160'}
                             style={styles.text_area}
                         />
-                        <Text style={styles.t4}>Edit location of your plant</Text>
+                        <Text style={styles.t4}>Edit area of your garden</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <TouchableOpacity
                                 style={{
@@ -66,7 +67,7 @@ const EditPlant = ({ navigation }) => {
                                     alignItems: 'center',
                                 }}
                                 onPress={() => {
-                                    navigation.navigate('EditPlantLocation', { plant, garden, onUpdate });
+                                    navigation.navigate('EditGardenPolygon', { garden, onUpdate });
                                 }}>
                                 <Image
                                     source={{
@@ -80,25 +81,16 @@ const EditPlant = ({ navigation }) => {
                                     Open Map
                                 </Text>
                             </TouchableOpacity>
-                            {Object.keys(plantNewLocation).length === 2 && (
-                                <Image
-                                    source={{
-                                        uri: 'https://cdn-icons-png.flaticon.com/32/8968/8968523.png',
-                                    }}
-                                    style={{
-                                        width: 38,
-                                        height: 38,
-                                    }}/>
-                            )}
+                            
                         </View>
 
-                        <Text style={styles.t4}>Edit plant note</Text>
+                        <Text style={styles.t4}>Edit garden note</Text>
                         <TextInput
-                            value={plantNote}
+                            value={gardenNote}
                             onChangeText={text => setTextInputValue(text)}
                             multiline
                             numberOfLines={5}
-                            placeholder="Plant notes..."
+                            placeholder="Garden notes..."
                             placeholderTextColor={'#21212160'}
                             style={styles.text_area}
                         />
@@ -113,4 +105,4 @@ const EditPlant = ({ navigation }) => {
     );
 };
 
-export default EditPlant;
+export default EditGarden;

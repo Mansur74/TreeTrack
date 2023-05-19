@@ -1,125 +1,123 @@
 import {
   View,
   Text,
-  TouchableOpacity,
-  ToastAndroid,
   Image,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
+import MapView, {
+  PROVIDER_GOOGLE,
+  Polygon,
+  Marker,
+  Polyline,
+} from 'react-native-maps';
+import React, {useState, useEffect} from 'react';
 import Geolocation from '@react-native-community/geolocation';
-import React, { useState, useEffect } from 'react';
-import { useRoute } from '@react-navigation/native';
-import { getPlantsOfGarden, isInsidePolygon } from '../services/garden_services';
 import { setMapPositionByGardenArea } from '../services/helper';
+import { getPlantsOfGarden } from '../services/garden_services';
 
-const EditPlantLocation = ({ navigation }) => {
+const EditGardenPolygon = ({navigation, route}) => {
+  const onUpdate =
+    route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
+  const garden =
+    route.params && route.params.garden ? route.params.garden : {polygon: []};
+
   const [selectedMapType, setMapType] = useState('standard');
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  // get current position
   const [currentPosition, setPosition] = useState({
-    latitude: 10,
-    longitude: 10,
+    latitude: 39.941155726554385,
+    longitude: 32.85929029670567,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
-  // current position updated when user moves
   useEffect(() => {
     Geolocation.getCurrentPosition(pos => {
       const crd = pos.coords;
       setPosition({
         latitude: crd.latitude,
         longitude: crd.longitude,
-        latitudeDelta: 0.001, // zoom map
+        latitudeDelta: 0.001,
         longitudeDelta: 0.001,
       });
     });
   }, []);
-
-  const route = useRoute();
-  const garden = route.params.garden;
-  const updatedPlant = route.params.plant;
-  const onUpdate = route.params.onUpdate;
   const [plants, setPlantList] = useState([]);
-  // get plants of selected garden
+  // get plants of edited garden
   useEffect(() => {
     const fetchData = async () => {
       setPlantList(await getPlantsOfGarden(garden.id));
     };
     fetchData();
   }, []);
-
+  // keeps pressed locations to draw polygon
+  const [coordinates, setCoordinates] = useState(garden.polygon);
+  // adds pressed point to coordinates list
   const handleMapPress = e => {
-    e.persist();
-    // if pressed point is outside of garden, do not show alert box to add garden
-    const isInsideGarden = isInsidePolygon(e.nativeEvent.coordinate, polygon);
-    if (isInsideGarden) {
-      setPlantList(plants.filter(p => p.id !== updatedPlant.id))
-      setSelectedLocation(e.nativeEvent.coordinate);
-      ToastAndroid.show('Plant location is changed', ToastAndroid.SHORT);
-    } else {
-      ToastAndroid.show(
-        'Selected location is not inside of this garden.',
-        ToastAndroid.LONG,
-      );
-    }
+    setCoordinates([...coordinates, e.nativeEvent.coordinate]);
   };
-  const handleCurrentLocationPress = () => {
-    // check whether current location is inside of garden
-    const isInsideGarden = isInsidePolygon(currentPosition, polygon);
-    if (isInsideGarden) {
-      setPlantList(plants.filter(p => p.id !== updatedPlant.id))
-      setSelectedLocation(currentPosition);
-      ToastAndroid.show('Plant location is changed.', ToastAndroid.SHORT);
-    } else {
-      ToastAndroid.show(
-        'Your current location is not inside of this garden.',
-        ToastAndroid.LONG,
-      );
-    }
+  // asks user to remove this point, when a marker is pressed
+  const handleMarkerPress = (coordinate, index) => {
+    Alert.alert(
+      'Remove Corner',
+      `Do you want to remove this corner from garden are?`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Remove',
+          onPress: () => {
+            setCoordinates(coordinates.filter(c => c !== coordinate));
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
+  // make initial position to garden's center
   const polygon = garden.polygon;
   let region = currentPosition;
   if (polygon.length > 2) {
     region = setMapPositionByGardenArea(polygon);
-  } else {
-    ToastAndroid.show(
-      "This garden's area is not declared.",
-      ToastAndroid.SHORT,
-    );
+  }
+  else{
+    ToastAndroid.show("This garden's area is not declared.", ToastAndroid.SHORT)
   }
 
   return (
-    <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{ height: '100%' }}>
-      <View style={styles.container}>
-        <Text style={styles.text}>edit plant location</Text>
+    <LinearGradient
+      colors={['#D1A96DE5', '#DB966FE5']}
+      style={{height: '100%'}}>
+      <View style={{padding: 20, flex: 1, marginBottom: 110}}>
+        <Text style={styles.text}>edit garden area</Text>
 
         <Text
           style={{
-            fontSize: 16,
-            color: '#efefef',
-            marginBottom: 10,
+            fontSize: 15,
+            color: '#FFF1DD',
           }}>
-          Edit {updatedPlant.name}'s location by tapping to map
+          Tab corners to remove or 
         </Text>
 
-        <View style={{ width: '100%', height: '50%' }}>
+        <View style={{width: '100%', height: '60%', marginVertical: 5}}>
           <MapView
+            style={{width: '100%', height: '100%', marginBottom: 15}}
             provider={PROVIDER_GOOGLE}
-            style={{ width: '100%', height: '100%', marginBottom: 15 }}
             showsUserLocation={true}
             initialRegion={region}
             onPress={handleMapPress}
             mapType={selectedMapType}>
-            {polygon.length > 2 && (
-              <Polygon
-                coordinates={polygon}
-                strokeWidth={2}
-                fillColor="rgba(167, 255, 200, 0.31)"
+            {coordinates.map((coordinate, index) => (
+              <Marker
+                key={index}
+                coordinate={coordinate}
+                onPress={() => handleMarkerPress(coordinate, index)}
               />
-            )}
+            ))}
             {plants.map(plant => (
               <Marker
                 key={plant.id}
@@ -134,7 +132,7 @@ const EditPlantLocation = ({ navigation }) => {
                   );
                 }}
                 style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: 'black', backgroundColor: '#efefef', opacity: plant.id === updatedPlant.id ? 1 : 0.6 }}>
+                <Text style={{ color: 'black', backgroundColor: '#efefef' }}>
                   {plant.name}
                 </Text>
                 <Image
@@ -145,31 +143,12 @@ const EditPlantLocation = ({ navigation }) => {
                   style={{
                     height: 25,
                     width: 25,
-                    tintColor: plant.id === updatedPlant.id ? null : 'gray',
-                    opacity: plant.id === updatedPlant.id ? 1 : 0.4,
                   }}
                 />
               </Marker>
             ))}
-            {selectedLocation && (
-              <Marker
-                coordinate={{
-                  latitude: selectedLocation.latitude,
-                  longitude: selectedLocation.longitude,
-                }}
-                style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: 'black', backgroundColor: '#efefef' }}>
-                  {updatedPlant.name}
-                </Text>
-                <Image
-                  source={{
-                    uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png',
-                  }}
-                  resizeMode="stretch"
-                  style={{ height: 25, width: 25, opacity: 1 }}
-                />
-              </Marker>
-            )}
+            {coordinates.length > 1 && <Polyline coordinates={coordinates} />}
+            {coordinates.length > 2 && <Polygon coordinates={coordinates} />}
           </MapView>
           <View
             style={{
@@ -187,13 +166,16 @@ const EditPlantLocation = ({ navigation }) => {
                 borderRadius: 10,
                 padding: 10,
               }}
-              onPress={handleCurrentLocationPress}>
-              <Text style={{ color: '#212121', fontSize: 12, fontWeight: '500' }}>
+              onPress={() => {
+                setCoordinates([...coordinates, currentPosition]);
+              }}>
+              <Text style={{color: '#212121', fontSize: 12, fontWeight: '500'}}>
                 Use Current Location
               </Text>
             </TouchableOpacity>
           </View>
         </View>
+
         <View
           style={{
             display: 'flex',
@@ -202,7 +184,6 @@ const EditPlantLocation = ({ navigation }) => {
             backgroundColor: '#09A555',
             padding: 4,
             borderRadius: 8,
-            marginTop: 5,
           }}>
           <TouchableOpacity
             onPress={() => setMapType('standard')}
@@ -213,7 +194,7 @@ const EditPlantLocation = ({ navigation }) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{ color: 'white' }}>Standart</Text>
+            <Text style={{color: 'white'}}>Standart</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setMapType('hybrid')}
@@ -224,7 +205,7 @@ const EditPlantLocation = ({ navigation }) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{ color: 'white' }}>Hybrid</Text>
+            <Text style={{color: 'white'}}>Hybrid</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setMapType('satellite')}
@@ -235,25 +216,19 @@ const EditPlantLocation = ({ navigation }) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{ color: 'white' }}>Satellite</Text>
+            <Text style={{color: 'white'}}>Satellite</Text>
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
           style={styles.button_right}
           onPress={() => {
-            navigation.navigate('EditPlant', {
-              new_coordinates: selectedLocation,
-              plant: updatedPlant,
-              garden,
-              onUpdate,
-            }); // go back to edit page to save garden
+            navigation.navigate('EditGarden', {polygon: coordinates, garden, onUpdate}); // go back to edit garden page
           }}>
-          <Text style={styles.bt1}> Save Location </Text>
+          <Text style={styles.bt1}> Save Area </Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 };
 
-export default EditPlantLocation;
+export default EditGardenPolygon;

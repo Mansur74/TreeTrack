@@ -20,7 +20,7 @@ const GardenCard = ({ navigation, garden, onUpdate }) => {
       : garden.image_url;
   return (
     <TouchableOpacity
-      onPress={()=>{navigation.navigate("ViewGarden", {garden: garden})}}>
+      onPress={()=>{navigation.navigate("ViewGarden", {garden, onUpdate})}}>
       <View
         style={{
           flexDirection: 'row',
@@ -67,7 +67,7 @@ const GardenCard = ({ navigation, garden, onUpdate }) => {
                   borderRadius: 5,
                 }}>
                 <View style={{ borderColor: '#888888', borderWidth: 1 }}>
-                  <MenuOption onSelect={() => alert(`Edit`)}>
+                  <MenuOption onSelect={() => navigation.navigate("EditGarden", {garden, onUpdate})}>
                     <Text style={{ textAlign: 'center', color: '#212121' }}>
                       Edit
                     </Text>

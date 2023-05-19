@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Dimensions, ToastAndroid} from 'react-native';
+import { View, Text, TouchableOpacity, ToastAndroid, Image} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
@@ -6,6 +6,7 @@ import Geolocation from '@react-native-community/geolocation';
 import React, { useState, useEffect } from 'react';
 import {useRoute} from '@react-navigation/native';
 import { getPlantsOfGarden, isInsidePolygon } from '../services/garden_services';
+import { setMapPositionByGardenArea } from '../services/helper';
 
 const AddPlantLocation = ({navigation}) => {
   const [selectedMapType, setMapType] = useState("standard");
@@ -69,20 +70,7 @@ const AddPlantLocation = ({navigation}) => {
   const polygon = garden.polygon;
   let region = currentPosition;
   if (polygon.length > 2) {
-    const {width, height} = Dimensions.get('window');
-    const aspectRatio = width / height;
-
-    const minLatitude = Math.min(...polygon.map(p => p.latitude));
-    const maxLatitude = Math.max(...polygon.map(p => p.latitude));
-    const minLongitude = Math.min(...polygon.map(p => p.longitude));
-    const maxLongitude = Math.max(...polygon.map(p => p.longitude));
-
-    const latitude = (minLatitude + maxLatitude) / 2;
-    const longitude = (minLongitude + maxLongitude) / 2;
-    const latitudeDelta = maxLatitude - minLatitude;
-    const longitudeDelta = (maxLongitude - minLongitude) * aspectRatio;
-
-    region = {latitude, longitude, latitudeDelta, longitudeDelta};
+    region = setMapPositionByGardenArea(polygon);
   }
   else{
     ToastAndroid.show("This garden's area is not declared.", ToastAndroid.SHORT)
@@ -124,16 +112,27 @@ const AddPlantLocation = ({navigation}) => {
                   latitude: plant.location.latitude,
                   longitude: plant.location.longitude,
                 }}
-                icon={{
-                  uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png', // https://cdn-icons-png.flaticon.com/64/7561/7561338.png
-                  width: 64,
-                  height: 64,
-                }}
                 onPress={() => {
                   ToastAndroid.show("Select another location for new plant.", ToastAndroid.LONG)
                 }}
-                style={{alignItems: 'center', justifyContent: 'center'}}
-                title={plant.name}></Marker>
+                style={{alignItems: 'center', justifyContent: 'center'}}>
+                <Text 
+                  style={{ color: 'black', backgroundColor: '#efefef', opacity: 0.6}}>
+                  {plant.name}
+                </Text>
+                <Image
+                  source={{
+                    uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png',
+                  }}
+                  resizeMode="stretch"
+                  style={{
+                    height: 25,
+                    width: 25,
+                    opacity: 0.4,
+                    tintColor: "gray"
+                  }}
+                />
+              </Marker>
             ))}
             {selectedLocation &&
              <Marker
@@ -141,13 +140,23 @@ const AddPlantLocation = ({navigation}) => {
                   latitude: selectedLocation.latitude,
                   longitude: selectedLocation.longitude,
                 }}
-                icon={{
-                  uri: "https://cdn-icons-png.flaticon.com/64/490/490091.png",
-                  width: 64,
-                  height: 64,
-                }}
                 style={{alignItems: 'center', justifyContent: 'center'}}
-                title={newPlantName}></Marker>}
+                >
+                <Text 
+                  style={{ color: 'black', backgroundColor: '#efefef'}}>
+                  {newPlantName}
+                </Text>
+                <Image
+                  source={{
+                    uri: 'https://cdn-icons-png.flaticon.com/64/685/685025.png',
+                  }}
+                  resizeMode="stretch"
+                  style={{
+                    height: 25,
+                    width: 25,
+                  }}
+                />
+              </Marker>}
           </MapView>
           <View
             style={{

@@ -1,7 +1,7 @@
 import EmptyPlants from "../layouts/EmptyPlants";
 import FilledPlants from "../layouts/FilledPlants";
 import { useEffect, useState } from "react";
-import { getPlantsOfGarden, getUserGardens } from "../services/garden_services";
+import { getPlantsOfGarden } from "../services/garden_services";
 
 const Plants = ({ navigation, route }) => {
 
