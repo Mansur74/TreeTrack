@@ -77,16 +77,26 @@ const ViewGarden = ({ navigation, route }) => {
                     style={{ flexDirection: "row", justifyContent: "center"}}
                 >
                     <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate("Plants", {garden: garden})
-                    }}
+                        onPress={() => {
+                            navigation.navigate("Plants", {garden: garden})
+                        }}
                          style={{...styles.button_right, marginRight: 10}}
                        >
                         <Text style={styles.bt1}> Display Plants </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                         style={{...styles.button_right, marginLeftt: 10}}
+                        onPress={() => {navigation.navigate("Map", {garden})}}
+                        style={{...styles.button_right, marginRight: 10}}
+                        >
+                        <Text style={styles.bt1}> Display in Map </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={{...styles.button_right}}
+                        onPress={() => {
+                            navigation.navigate("Galleries", {garden, showGarden: true})
+                        }}
                         >
                         <Text style={styles.bt1}> View in Gallery </Text>
                     </TouchableOpacity>

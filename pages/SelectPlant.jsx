@@ -1,45 +1,51 @@
-import { View, Text, TouchableOpacity, ToastAndroid, Modal, Alert, TextInput, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ToastAndroid,
+  Modal,
+  Alert,
+  TextInput,
+  Image,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Polygon, Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {useRoute} from '@react-navigation/native';
-import storage from "@react-native-firebase/storage"
-import { getPlantsOfGarden, isInsidePolygon } from '../services/garden_services';
-import { insertNewPlant, insertPlantNote } from '../services/plant_services';
-import { setMapPositionByGardenArea } from '../services/helper';
+import {getPlantsOfGarden, isInsidePolygon} from '../services/garden_services';
+import {insertNewPlant} from '../services/plant_services';
+import {setMapPositionByGardenArea} from '../services/helper';
+import AutocompleteInput from 'react-native-autocomplete-input';
 
-const plantTypes = [
-  {
-    plant_type: 'Walnut',
-    id: 1,
-  },
-  {
-    plant_type: 'Olive',
-    id: 2,
-  },
+const plantTypeList = [
+  'Walnut',
+  'Olive',
+  'Tulip',
+  'Rose',
+  'Orange',
+  'Apple'
 ];
 const SelectPlant = ({navigation}) => {
-  const [selectedMapType, setMapType] = useState("standard");
+  const [selectedMapType, setMapType] = useState('standard');
   const [modalVisible, setModalVisible] = useState(false);
-  const [newPlantType, setPickerValue] = useState(plantTypes[0]);
   const [newPlantName, setNewPlantName] = useState(null);
-  const [newPlantLocation, setNewPlantLocation] = useState(null)
+  const [newPlantLocation, setNewPlantLocation] = useState(null);
   const addNewPlant = async () => {
     let newPlant = {
       created_at: new Date(),
       name: newPlantName,
-      plant_type: newPlantType,
+      plant_type: selectedPlantType,
       location: newPlantLocation,
       garden_id: selectedGarden.id,
     };
     try {
-      const ref_id = await insertNewPlant(newPlant)
+      const ref_id = await insertNewPlant(newPlant);
       setModalVisible(!modalVisible);
       ToastAndroid.show('New plant is saved.', ToastAndroid.SHORT);
-      newPlant = { ...newPlant, id: ref_id };
+      newPlant = {...newPlant, id: ref_id};
       // console.log('Inserted newPlant: ', newPlant);
       plants.push(newPlant);
       setSelectedPlant(newPlant);
@@ -79,11 +85,11 @@ const SelectPlant = ({navigation}) => {
     fetchData();
   }, []);
 
-  const handleMapPress = (e) => {
+  const handleMapPress = e => {
     e.persist();
     // if pressed point is outside of garden, do not show alert box to add garden
     const isInsideGarden = isInsidePolygon(e.nativeEvent.coordinate, polygon);
-    if(isInsideGarden){
+    if (isInsideGarden) {
       Alert.alert(
         'Add New Plant',
         `Do you want to add a new plant?`,
@@ -104,12 +110,11 @@ const SelectPlant = ({navigation}) => {
         {cancelable: false},
       );
     }
-   
   };
   const handleCurrentLocationPress = () => {
     // check whether current location is inside of garden
-    const isInsideGarden = isInsidePolygon(currentPosition, polygon)
-    if(isInsideGarden){
+    const isInsideGarden = isInsidePolygon(currentPosition, polygon);
+    if (isInsideGarden) {
       Alert.alert(
         'Add New Plant',
         `Do you want to add a new plant?`,
@@ -129,84 +134,50 @@ const SelectPlant = ({navigation}) => {
         ],
         {cancelable: false},
       );
+    } else {
+      ToastAndroid.show(
+        'Your current location is not inside of this garden. New plant cannot be inserted.',
+        ToastAndroid.LONG,
+      );
     }
-    else{
-      ToastAndroid.show("Your current location is not inside of this garden. New plant cannot be inserted.", ToastAndroid.LONG)
-    }
-    
-  }
+  };
   /*plants.forEach(element => {
     console.log("=== plant: ", element)
   });*/
-  const plantNote = route.params.plantNote;
-  const image = route.params.imagePath;
 
   const polygon = selectedGarden.polygon;
   let region = currentPosition;
   if (polygon.length > 2) {
     region = setMapPositionByGardenArea(polygon);
-  }
-  else{
-    ToastAndroid.show("This garden's area is not declared.", ToastAndroid.SHORT)
+  } else {
+    ToastAndroid.show(
+      "This garden's area is not declared.",
+      ToastAndroid.SHORT,
+    );
   }
   let initialMessage = 'You did not select any plant';
   if (plants.length == 0) {
     initialMessage = 'This garden has no plant';
   }
   const [selectedPlant, setSelectedPlant] = useState(null);
-
-  const uploadImage = async (imageUri, folderName) => {
-    const imageRef = storage().ref(
-      `${folderName}/${imageUri.split('/').pop()}`,
-    );
-    const response = await fetch(imageUri);
-    console.log('\nuploadImage response: ', response.status, ' ', response);
-    const blob = await response.blob();
-
-    await imageRef.put(blob);
-  };
-
-  const getImageUrl = async (folderName, imageName) => {
-    const imageRef = storage().ref(`${folderName}/${imageName}`);
-    return await imageRef.getDownloadURL();
-  };
-
-  const saveNote = async () => {
-    if (!selectedPlant) {
-      ToastAndroid.show(
-        'You must select a plant to save note.',
-        ToastAndroid.LONG,
-      );
-    } else {
-      // upload image to storage and get URL
-      let imageUrl = null;
-      if (image != null && image.path != null) {
-        const imageName = image.path.split('/').pop();
-        await uploadImage(image.path, 'plants');
-        console.log('Image is saved');
-        imageUrl = await getImageUrl('plants', imageName);
-        console.log('URL of saved image: ', imageUrl);
-      }
-      // construct new plant note
-      const newPlantNote = {
-        created_at: new Date(),
-        plant_id: selectedPlant.id,
-        note: plantNote,
-        image_url: imageUrl,
-      };
-      try {
-        await insertPlantNote(newPlantNote); 
-        ToastAndroid.show(
-          'Plant note for ' + selectedPlant.name + ' is saved.',
-          ToastAndroid.LONG,
-        );
-        navigation.navigate('AddNote');
-      } catch (error) {
-        console.log('Insert plant note error: ', error);
-      }
+  //const [newPlantType, setPickerValue] = useState(plantTypes[0]);
+  const [plantTypes, setPlantTypes] = useState(plantTypeList); // Example garden types
+  const [selectedPlantType, setSelectedPlantType] = useState('');
+  const [isHidden, setShowAutoCompleteResult] = useState(true);
+  const findPlantTypes = searchText => {
+    if (searchText === '') {
+      return [];
     }
+    const filteredPlantTypes = plantTypes.filter(plantType =>
+      plantType.toLowerCase().includes(searchText.toLowerCase()),
+    );
+    return filteredPlantTypes;
   };
 
+  const handleSelection = item => {
+    setSelectedPlantType(item);
+    setShowAutoCompleteResult(true);
+  };
   return (
     <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
       <View style={styles.container}>
@@ -248,9 +219,13 @@ const SelectPlant = ({navigation}) => {
                   setSelectedPlant(plant);
                 }}
                 style={{alignItems: 'center', justifyContent: 'center'}}>
-                <Text 
-                  style={{ color: 'black', backgroundColor: '#efefef',
-                           opacity: selectedPlant && plant.id === selectedPlant.id ? 1 : 0.5 }}>
+                <Text
+                  style={{
+                    color: 'black',
+                    backgroundColor: '#efefef',
+                    opacity:
+                      selectedPlant && plant.id === selectedPlant.id ? 1 : 0.5,
+                  }}>
                   {plant.name}
                 </Text>
                 <Image
@@ -261,7 +236,8 @@ const SelectPlant = ({navigation}) => {
                   style={{
                     height: 25,
                     width: 25,
-                    opacity: selectedPlant && plant.id === selectedPlant.id ? 1 : 0.4,
+                    opacity:
+                      selectedPlant && plant.id === selectedPlant.id ? 1 : 0.4,
                   }}
                 />
               </Marker>
@@ -298,7 +274,7 @@ const SelectPlant = ({navigation}) => {
             backgroundColor: '#09A555',
             padding: 4,
             borderRadius: 8,
-            marginTop: 5
+            marginTop: 5,
           }}>
           <TouchableOpacity
             onPress={() => setMapType('standard')}
@@ -309,7 +285,7 @@ const SelectPlant = ({navigation}) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Standart</Text>
+            <Text style={{color: 'white'}}>Standart</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setMapType('hybrid')}
@@ -320,7 +296,7 @@ const SelectPlant = ({navigation}) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Hybrid</Text>
+            <Text style={{color: 'white'}}>Hybrid</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setMapType('satellite')}
@@ -331,7 +307,7 @@ const SelectPlant = ({navigation}) => {
               paddingVertical: 5,
               borderRadius: 5,
             }}>
-            <Text style={{color: "white"}}>Satellite</Text>
+            <Text style={{color: 'white'}}>Satellite</Text>
           </TouchableOpacity>
         </View>
         {/* modal for adding new plant */}
@@ -375,30 +351,54 @@ const SelectPlant = ({navigation}) => {
                       marginVertical: 10,
                     }}></TextInput>
                   {/*plant type picker */}
-                  <View
+                  <View 
                     style={{
-                      ...styles.picker_view,
                       width: '90%',
-                      borderWidth: 1,
-                      borderColor: '#21212150',
-                    }}>
-                    <Picker
-                      dropdownIconRippleColor={'rgba(202, 255, 222, 0.56)'}
-                      dropdownIconColor={'#21212110'}
-                      style={{color: '#212121'}}
-                      selectedValue={newPlantType}
-                      onValueChange={itemValue => {
-                        setPickerValue(itemValue);
-                      }}>
-                      {plantTypes.map(plant_type => (
-                        <Picker.Item
-                          key={plant_type.id}
-                          label={plant_type.plant_type}
-                          value={plant_type.plant_type}
-                          
-                        />
-                      ))}
-                    </Picker>
+                      height: isHidden ? 42 : 150,
+                      borderWidth: 0,
+                      borderRadius: 5,
+                      marginBottom: isHidden ? 0 : 30
+                  }}>
+                    <AutocompleteInput
+                      data={findPlantTypes(selectedPlantType)}
+                      defaultValue={selectedPlantType}
+                      onChangeText={text => {
+                        setSelectedPlantType(text);
+                        setShowAutoCompleteResult(false);
+                      }}
+                      hideResults={isHidden}
+                      style={{
+                        width: '100%',
+                        height: 42,
+                        paddingStart: 10,
+                        paddingEnd: 10,
+                        color: '#212121',
+                        textAlignVertical: 'top',
+                        elevation: 5,
+                        fontSize: 16,
+                        borderRadius: 5,
+                        borderWidth: 0,
+                        backgroundColor: "#fff"
+                      }}
+                      placeholder="Enter plant type"
+                      placeholderTextColor={'#21212160'}
+                      flatListProps={{
+                        keyExtractor: (_, idx) => idx,
+                        renderItem: ({item}) => (
+                          <TouchableOpacity
+                            onPress={() => handleSelection(item)}>
+                            <Text
+                              style={{
+                                borderWidth: 0,
+                                padding: 10,
+                                color: '#212121',
+                              }}>
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
+                        ),
+                      }}
+                    />
                   </View>
                   <View
                     style={{
@@ -472,14 +472,16 @@ const SelectPlant = ({navigation}) => {
             </Text>
           )}
         </View>
-
-        <TouchableOpacity style={styles.button_right} onPress={saveNote}>
-          <Text style={styles.bt1}> Save Note </Text>
+        <TouchableOpacity
+          style={styles.button_right}
+          onPress={() => {
+            navigation.navigate('AddNote', {selectedPlant});
+          }}>
+          <Text style={styles.bt1}> Select </Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 };
-
 
 export default SelectPlant;

@@ -246,7 +246,7 @@ export const getSortedGardensByDistance = async (userLocation) => {
       gardensWithoutPolygon.push(garden)
     }
   });
-  const sortedGardens = gardensWithDistance.sort((a, b) => b.distance - a.distance);
+  const sortedGardens = gardensWithDistance.sort((a, b) => a.distance - b.distance);
   const concatenatedGardenList = sortedGardens.concat(gardensWithoutPolygon)
   return concatenatedGardenList
 }

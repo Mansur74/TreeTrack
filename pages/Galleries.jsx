@@ -5,7 +5,12 @@ import GardenGallery from '../layouts/gallery/GardenGallery';
 import PlantGallery from '../layouts/gallery/PlantGallery';
 import React, { useState, useEffect} from 'react';
 
-const Galleries = () => {
+const Galleries = ({route}) => {
+  // TODO: view in gallery
+  const garden = route.params && route.params.garden ? route.params.garden : null;
+  const plant = route.params && route.params.plant ? route.params.plant : null;
+  const isGardenShown = route.params && route.params.showGarden !== null ? route.params.showGarden : false;
+  
   const [showGarden, setShowGarden] = useState(true) // display gardens by default
 
   return (
@@ -79,7 +84,7 @@ const Galleries = () => {
             borderTopLeftRadius: 50,
             borderTopRightRadius: 50,
           }}>
-          {showGarden && <GardenGallery></GardenGallery>}
+          {showGarden && <GardenGallery selectedGarden = {garden}></GardenGallery>}
           {!showGarden && <PlantGallery></PlantGallery>}
         </View>
       </View>

@@ -9,7 +9,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../../styles/Style';
 import React, {useState, useEffect} from 'react';
-import PhotoPick from '../ImagePicker';
+import PhotoPick from '../photo_picker/ImagePicker';
 import {Picker} from '@react-native-picker/picker';
 import storage from '@react-native-firebase/storage';
 import {getSortedGardensByDistance, insertGardenNote} from '../../services/garden_services';
@@ -17,12 +17,8 @@ import Geolocation from '@react-native-community/geolocation';
 
 const GardenNote = ({navigation}) => {
   const [gardenList, setGardenList] = useState([]);
-  const [currentPosition, setPosition] = useState({
-    latitude: 39.941155726554385,
-    longitude: 32.85929029670567,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  });
+  // TODO: konum takibi izin verilmemişse varsayılan konumu Ankara yap
+  const [currentPosition, setPosition] = useState(null);
   useEffect(() => {
     Geolocation.getCurrentPosition(pos => {
       const crd = pos.coords;
@@ -34,14 +30,17 @@ const GardenNote = ({navigation}) => {
       });
     });
   }, []);
+  
   // bahçeler kullanıcının konumuna olan yakınlığına göre sıralanır
   useEffect(() => {
     const fetchData = async () => {
-      setGardenList(await getSortedGardensByDistance(currentPosition));
+      if(currentPosition){
+        setGardenList(await getSortedGardensByDistance(currentPosition));
+      }
       // TODO: hiç bahçe yoksa create garden'a yönlendirilmeli
     };
     fetchData();
-  }, []);
+  }, [currentPosition]);
 
   {/* TODO: kullanıcıya en yakın olan bahçelere göre bu liste sıralanmalı */}
   let gardenNames = gardenList.map(garden => ({
@@ -54,11 +53,14 @@ const GardenNote = ({navigation}) => {
   const [gardenNote, setTextInputValue] = useState('');
 
   const [image, setSelectedImage] = useState(null);
+  
+  const [isImageCleared, setIsImageCleared] = useState(false)
   const onSelectImage = image => {
     if (!image) {
       setSelectedImage(null);
     } else {
       setSelectedImage(image);
+      setIsImageCleared(false)
     }
   };
 
@@ -101,12 +103,18 @@ const GardenNote = ({navigation}) => {
         'Garden note for ' + selectedGarden.name + ' is saved.',
         ToastAndroid.LONG,
       );
+      // clear inputs
+      setIsImageCleared(true)
+      setTextInputValue('')
+      setSelectedGarden(gardenList[0])
+      setGardenPickerValue(gardenNames[0])
       navigation.navigate('AddNote');  
     } catch (error) {
       console.log('Insert garden note error: ', error);
     }
     
   };
+  
   return (
     <LinearGradient colors={['#89C6A7', '#89C6A7']} style={{height: '100%'}}>
       <ScrollView>
@@ -114,7 +122,7 @@ const GardenNote = ({navigation}) => {
           <Text style={styles.t4}>
             Take a photo of your garden or select it from your gallery.
           </Text>
-          <PhotoPick onSelect={onSelectImage}></PhotoPick>
+          <PhotoPick onSelect={onSelectImage} isCleared = {isImageCleared} setIsCleared = {setIsImageCleared}></PhotoPick>
 
           <Text style={styles.t4}>Select a garden</Text>
           <View style={styles.picker_view}>

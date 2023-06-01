@@ -6,27 +6,28 @@ import {
   Image,
   ScrollView,
   ToastAndroid,
+  KeyboardAvoidingView
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
 import React, { useState } from 'react';
-import PhotoPick from '../layouts/ImagePicker';
+import PhotoPick from '../layouts/photo_picker/ImagePicker';
 import storage from "@react-native-firebase/storage"
 import { insertGarden } from '../services/garden_services';
+import AutocompleteInput from 'react-native-autocomplete-input';
 
 // fake data - TODO: retrieve from API
 const gardenTypeList = [
-  { id: 1, name: 'Farm' },
-  { id: 2, name: 'Container Garden' },
-  { id: 3, name: 'Ferennial garden' },
-  { id: 4, name: 'Rose garden' },
-  { id: 5, name: 'Water garden' },
+  'Farm',
+  'Container Garden',
+  'Ferennial garden',
+  'Rose garden',
+  'Water garden',
 ];
 const CreateGarden = ({ route, navigation }) => {
   const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
   const polygon = route.params && route.params.coordinates ? route.params.coordinates : [];
-  const [gardenTypePickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
   const [gardenName, setGardenName] = useState(null);
   const [gardenNote, setGardenNote] = useState(null);
@@ -55,7 +56,7 @@ const CreateGarden = ({ route, navigation }) => {
       created_at: new Date(),
       polygon: polygon,
       image_url: imageUrl,
-      garden_type: gardenTypePickerValue
+      garden_type: selectedGardenType
     };
     // TODO: bahçe notunu da kaydet? 
     try {
@@ -83,21 +84,31 @@ const CreateGarden = ({ route, navigation }) => {
     const imageRef = storage().ref(`${folderName}/${imageName}`);
     return await imageRef.getDownloadURL();
   }
+  const [gardenTypes, setGardenTypes] = useState(gardenTypeList); // Example garden types
+  const [selectedGardenType, setSelectedGardenType] = useState('');
+  const [isHidden, setShowAutoCompleteResult] = useState(true)
+  const findGardenTypes = (searchText) => {
+    if (searchText === '') {
+      return [];
+    }
+    const filteredGardenTypes = gardenTypes.filter((gardenType) =>
+      gardenType.toLowerCase().includes(searchText.toLowerCase())
+    );
+    return filteredGardenTypes;
+  };
 
+  const handleSelection = (item) => {
+    setSelectedGardenType(item);
+    setShowAutoCompleteResult(true)
+  };
+  
   return (
     <LinearGradient
       colors={['#D1A96DE5', '#DB966FE5']}
       style={{ height: '100%' }}>
       <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
         <Text style={styles.text}>add a new garden</Text>
-
-        <ScrollView>
-          <View
-            style={{
-              padding: 10,
-              width: '100%',
-            }}>
-            <Text style={styles.t4}>Add a photo of your garden</Text>
+        <Text style={styles.t4}>Add a photo of your garden</Text>
             <PhotoPick onSelect={onSelectImage}></PhotoPick>
             <Text style={styles.t4}>Give a name to your garden</Text>
             <TextInput
@@ -119,26 +130,70 @@ const CreateGarden = ({ route, navigation }) => {
                 fontSize: 16,
               }}></TextInput>
             <Text style={styles.t4}>Select garden type</Text>
-            <View style={styles.picker_view}>
-              <Picker
-                dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
-                dropdownIconColor={'#21212110'}
-                style={{ color: '#212121' }}
-                selectedValue={gardenTypePickerValue}
-                onValueChange={itemValue => {
-                  setPickerValue(itemValue);
-                }}>
-                {gardenTypeList.map(gardenType => (
-                  <Picker.Item
-                    key={gardenType.id}
-                    label={gardenType.name}
-                    value={gardenType.name}
-                    
-                  />
-                ))}
-              </Picker>
+            <View 
+              style={{
+                width: '100%',
+                height: isHidden ? 42 : 150,
+                borderWidth: 0,
+                borderRadius: 5,
+                marginBottom: isHidden ? 0 : 30
+            }}>
+            <AutocompleteInput
+              data={findGardenTypes(selectedGardenType)}
+              defaultValue={selectedGardenType}
+              onChangeText={(text) => {
+                setSelectedGardenType(text) 
+                setShowAutoCompleteResult(false)
+              }}
+              
+              hideResults = {isHidden}
+              style={{
+                width: '100%',
+                height: 42,
+                paddingStart: 10,
+                paddingEnd: 10,
+                backgroundColor: 'white',
+                borderRadius: 10,
+                borderWidth: 0,
+                color: '#212121',
+                textAlignVertical: 'top',
+                elevation: 5,
+                fontSize: 16,
+              }}
+              placeholder='Enter garden type'
+              placeholderTextColor={'#21212160'}
+              flatListProps={{
+                keyExtractor: (_, idx) => idx,
+                renderItem: ({ item }) => 
+                <TouchableOpacity 
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 5
+                  }}
+                  onPress={() => handleSelection(item)}>
+                  <Text 
+                    style={{
+                      borderWidth: 0,
+                      padding: 10,
+                      color:"#212121"
+                    }}
+                    >{item}</Text>
+              </TouchableOpacity>,
+              }}
+            />
+
             </View>
 
+         
+            
+
+        <ScrollView>
+          <View
+            style={{
+              padding: 10,
+              width: '100%',
+            }}>
+            
             <Text style={styles.t4}>Add location of your garden</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity

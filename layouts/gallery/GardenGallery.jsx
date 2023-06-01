@@ -12,7 +12,8 @@ import styles from "../../styles/Style";
 import { getGardenNotes, getUserGardenNames } from '../../services/garden_services';
 import { formatDate, sortNoteList } from '../../services/helper';
 
-const GardenGallery = () => {
+const GardenGallery = ({selectedGarden}) => {
+  console.log("selected garden: ", selectedGarden) // TODO - view in gallery
   const [gardenNoteList, setNoteList] = useState([]);
   const [filteredNoteList, setFilteredNoteList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

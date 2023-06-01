@@ -7,10 +7,9 @@ import UnPick from './UnPick';
 import ImagePicker from 'react-native-image-crop-picker';
 
 
-const PhotoPick = ({onSelect}) => {
+const PhotoPick = ({onSelect, isCleared, setIsCleared}) => {
 
   const handleUnPick = () => setImageSelected(false);
-
   const [imagePath, setImage] = useState(null);
   const [isImageSelected, setImageSelected] = useState(false);
 
@@ -24,6 +23,8 @@ const PhotoPick = ({onSelect}) => {
         // console.log("Image (camera): ", image);
         setImage(image.path);
         setImageSelected(true);
+        isCleared = false
+        setIsCleared(false)
         onSelect(image);
         //this.bs.current.snapTo(1);
       })
@@ -47,6 +48,8 @@ const PhotoPick = ({onSelect}) => {
         //console.log('Image (gallery): ', image);
         setImage(image.path);
         setImageSelected(true);
+        isCleared = false
+        setIsCleared(false)
         onSelect(image);
       })
       .catch(error => {
@@ -61,7 +64,7 @@ const PhotoPick = ({onSelect}) => {
 
   return (
     <View>
-      {isImageSelected ? (
+      {isImageSelected && !isCleared ? (
         <Pick unPick={handleUnPick} image={imagePath} />
       ) : (
         <UnPick openCamera={openCamera} openGallery={openGallery} />

@@ -10,7 +10,10 @@ const ViewGarden = ({ navigation, route }) => {
     const garden = route.params.garden;
     const onUpdate = route.params.onUpdate;
     const [plantNotes, setPlantNotes] = useState([]);
-
+    if(plant.plant_type.plant_type){
+        let pt = plant.plant_type.plant_type
+        plant.plant_type = pt
+    }
     useEffect(() => {
         const fetchData = async () => {
             const notes = await getPlantNotesById(plant.id)
@@ -78,8 +81,11 @@ const ViewGarden = ({ navigation, route }) => {
                 >
 
                     <TouchableOpacity
-                         style={{...styles.button_right, marginLeftt: 10}}
-                        >
+                        onPress={() => {
+                            navigation.navigate("Galleries", {plant, showGarden: false})
+                        }}
+                        style={{...styles.button_right, marginLeftt: 10}}
+                    >
                         <Text style={styles.bt1}> View in Gallery </Text>
                     </TouchableOpacity>
 

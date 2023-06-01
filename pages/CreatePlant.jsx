@@ -7,23 +7,28 @@ import {
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
 import React, { useState } from 'react';
-import PhotoPick from '../layouts/ImagePicker';
+import PhotoPick from '../layouts/photo_picker/ImagePicker';
 import storage from "@react-native-firebase/storage"
 import { insertNewPlant } from '../services/plant_services';
+import AutocompleteInput from 'react-native-autocomplete-input';
+
 
 // fake data - TODO: retrieve from API
-const gardenTypeList = [
-  { id: 1, name: 'Walnut' }
+const plantTypeList = [
+  'Walnut',
+  'Olive',
+  'Tulip',
+  'Rose',
+  'Orange',
+  'Apple'
 ];
 const CreatePlant = ({ route, navigation }) => {
   const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => { };
   const plantLocation = route.params && route.params.coordinates ? route.params.coordinates : [];
   const garden = route.params.garden
-  const [plantTypePickerValue, setPickerValue] = useState(gardenTypeList[0].name);
   const [imagePath, setSelectedImage] = useState(null);
   const [plantName, setPlantName] = useState(null);
   const [plantNote, setPlantNote] = useState(null);
@@ -48,7 +53,7 @@ const CreatePlant = ({ route, navigation }) => {
     }
     const plantData = {
       name: plantName,
-      plant_type: plantTypePickerValue,
+      plant_type: selectedPlantType,
       created_at: new Date(),
       garden_id: garden.id,
       location: plantLocation,
@@ -81,6 +86,23 @@ const CreatePlant = ({ route, navigation }) => {
     return await imageRef.getDownloadURL();
   }
 
+  const [plantTypes, setPlantTypes] = useState(plantTypeList); // Example garden types
+  const [selectedPlantType, setSelectedPlantType] = useState('');
+  const [isHidden, setShowAutoCompleteResult] = useState(true)
+  const findPlantTypes = (searchText) => {
+    if (searchText === '') {
+      return [];
+    }
+    const filteredPlantTypes = plantTypes.filter((plantType) =>
+      plantType.toLowerCase().includes(searchText.toLowerCase())
+    );
+    return filteredPlantTypes;
+  };
+
+  const handleSelection = (item) => {
+    setSelectedPlantType(item);
+    setShowAutoCompleteResult(true)
+  };
   return (
     <LinearGradient
       colors={['#89C6A7', '#89C6A7']}
@@ -88,14 +110,7 @@ const CreatePlant = ({ route, navigation }) => {
       <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
       <Text style={{ fontSize: 20, color: "white", fontWeight: "bold", color: "#fff" }}> {'\u003E'}{garden.name} </Text>
         <Text style={styles.text}>add a new plant</Text>
-
-        <ScrollView>
-          <View
-            style={{
-              padding: 10,
-              width: '100%',
-            }}>
-            <Text style={styles.t4}>Add a photo of your plant</Text>
+        <Text style={styles.t4}>Add a photo of your plant</Text>
             <PhotoPick onSelect={onSelectImage}></PhotoPick>
             <Text style={styles.t4}>Give a name to your plant</Text>
             <TextInput
@@ -117,26 +132,65 @@ const CreatePlant = ({ route, navigation }) => {
                 fontSize: 16,
               }}></TextInput>
             <Text style={styles.t4}>Select plant type</Text>
-            <View style={styles.picker_view}>
-              <Picker
-                dropdownIconRippleColor={'rgba(255, 209, 188, 0.56)'}
-                dropdownIconColor={'#21212110'}
-                style={{ color: '#212121' }}
-                selectedValue={plantTypePickerValue}
-                onValueChange={itemValue => {
-                  setPickerValue(itemValue);
-                }}>
-                {gardenTypeList.map(gardenType => (
-                  <Picker.Item
-                    key={gardenType.id}
-                    label={gardenType.name}
-                    value={gardenType.name}
-
-                  />
-                ))}
-              </Picker>
+            <View 
+              style={{
+                width: '100%',
+                height: isHidden ? 42 : 150,
+                borderWidth: 0,
+                borderRadius: 5,
+                marginBottom: isHidden ? 0 : 20
+            }}>
+              <AutocompleteInput
+                data={findPlantTypes(selectedPlantType)}
+                defaultValue={selectedPlantType}
+                onChangeText={(text) => {
+                  setSelectedPlantType(text) 
+                  setShowAutoCompleteResult(false)
+                }}
+                
+                hideResults = {isHidden}
+                style={{
+                  width: '100%',
+                  height: 42,
+                  paddingStart: 10,
+                  paddingEnd: 10,
+                  backgroundColor: 'white',
+                  borderRadius: 10,
+                  borderWidth: 0,
+                  color: '#212121',
+                  textAlignVertical: 'top',
+                  elevation: 5,
+                  fontSize: 16,
+                }}
+                placeholder='Enter plant type'
+                placeholderTextColor={'#21212160'}
+                flatListProps={{
+                  keyExtractor: (_, idx) => idx,
+                  renderItem: ({ item }) => 
+                  <TouchableOpacity 
+                    style={{
+                      borderWidth: 0,
+                      borderRadius: 5
+                    }}
+                    onPress={() => handleSelection(item)}>
+                    <Text 
+                      style={{
+                        borderWidth: 0,
+                        padding: 10,
+                        color:"#212121"
+                      }}
+                      >{item}</Text>
+                </TouchableOpacity>,
+                }}
+              />
             </View>
 
+        <ScrollView>
+          <View
+            style={{
+              padding: 10,
+              width: '100%',
+            }}>
             <Text style={styles.t4}>Add location of your plant</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity

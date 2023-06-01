@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import styles from '../styles/Style';
+import styles from '../../styles/Style';
 
 const UnPick = ({openCamera, openGallery}) => {
   return (
@@ -12,9 +12,9 @@ const UnPick = ({openCamera, openGallery}) => {
       
         <TouchableOpacity
           onPress={openCamera}
-          title="Open Camera"
+          title="Take a Photo"
           style={styles.button}>
-          <Text style={styles.bt1}> Open Camera </Text>
+          <Text style={styles.bt1}> Take a Photo</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

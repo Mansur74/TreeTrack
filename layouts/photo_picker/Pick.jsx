@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-import styles from '../styles/Style';
+import styles from '../../styles/Style';
 
 const Pick = ({ unPick, image }) => {
   return (

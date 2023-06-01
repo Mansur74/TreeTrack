@@ -11,8 +11,18 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 import {getUserGardens} from '../services/garden_services';
+import { useRoute } from '@react-navigation/native';
+import { setMapPositionByGardenArea } from '../services/helper';
+
 
 const Map = () => {
+  const route = useRoute();
+  let selectedGarden = route.params && route.params.garden ? route.params.garden : null;
+  
+  let selectedGardenCenter = null
+  if(selectedGarden !== null){
+    selectedGardenCenter = setMapPositionByGardenArea(selectedGarden.polygon)
+  }
   const [selectedMapType, setMapType] = useState('standard');
   const [currentPosition, setPosition] = useState({
     latitude: 39.941155726554385,
@@ -97,10 +107,11 @@ const Map = () => {
             style={{width: '100%', height: '100%'}}
             provider={PROVIDER_GOOGLE}
             showsUserLocation={true}
-            region={currentPosition}
-            initialRegion={currentPosition}
+            region={selectedGardenCenter ? selectedGardenCenter : currentPosition}
+            initialRegion={selectedGardenCenter ? selectedGardenCenter : currentPosition}
             mapType={selectedMapType}>
             {marker && <Marker coordinate={marker} />}
+            {/* {selectedGardenCenter && <Marker coordinate={selectedGardenCenter} />} */}
             {/* TODO: kullanıcıya en yakın olan bahçeler gösterilecek */}
             {gardens.map(garden => (
               <Polygon
@@ -108,7 +119,19 @@ const Map = () => {
                 coordinates={garden.polygon}
                 strokeWidth={2}
                 fillColor="rgba(167, 255, 200, 0.31)"
-              />
+                
+              >
+              </Polygon>
+            ))}
+
+            {gardens.map(garden => (
+               <Marker key={garden.id} coordinate={garden.polygon[0]}>
+                <Text style={{ color: 'black', backgroundColor: '#fff', padding: 5, borderColor: "red", borderWidth: 1}}>
+                  {garden.name}
+                </Text>
+               </Marker>
+               
+              
             ))}
             {/* TODO: Show plants of each garden. */}
           </MapView>
