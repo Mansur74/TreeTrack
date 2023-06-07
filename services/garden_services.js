@@ -81,13 +81,15 @@ export const deleteGarden = async gardenId => {
   });
   console.log("PLANTS REMOVED")
   // remove plant notes
-  let plantNotesRef = await firestore()
-    .collection('plant_notes')
-    .where('plant_id', 'in', plant_id_list)
-    .get();
-  plantNotesRef.docs.map(async doc => {
-    await doc.ref.delete()
-  });
+  let plantCollection = await firestore().collection("plants")
+  const plantBatches = [];
+  while (plant_id_list.length) {
+    const batch = plant_id_list.splice(0, 10);
+    plantBatches.push(plantCollection.where('plant_id', 'in', [...batch]).get().then(results => results.docs.map(async doc => {
+      await doc.ref.delete()
+    } )))
+  }
+  await Promise.all(plantBatches)
   console.log("PLANT NOTES REMOVED")
 };
 
@@ -140,39 +142,41 @@ export const getUserGardenIds = async () => {
 // kullanıcının bütün bahçelerindeki notları döndürür
 export const getGardenNotes = async () => {
   const gardenIds = await getUserGardenIds();
+  const gardenIdsForNote = JSON.parse(JSON.stringify(gardenIds))
   if(gardenIds.length == 0){
     console.log("Empty garden id list.")
     return []
   }
-  let gardensRef = await firestore()
-    .collection('gardens')
-    .where('id', 'in', gardenIds)
-    .get();
-
-  const gardens = gardensRef.docs.map(doc => {
-    const data = doc.data();
-    //data.created_at = String(data.created_at.toDate());
-    return data;
+  // get gardens
+  let gardensCollection = await firestore().collection('gardens')
+  const gardenBatches = [];
+  while (gardenIds.length) {
+    const batch = gardenIds.splice(0, 10);
+    gardenBatches.push(gardensCollection.where('id', 'in', [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+  }
+  const gardens = await Promise.all(gardenBatches).then(content => {
+    return content.flat()
   });
 
-  let gardenNotesRef = await firestore()
-    .collection('garden_notes')
-    .where('garden_id', 'in', gardenIds)
-    .orderBy('created_at', 'desc')
-    .get();
-  const garden_notes = gardenNotesRef.docs.map(doc => {
-    const data = doc.data();
-    //data.created_at = String(data.created_at.toDate());
-    return data;
-  });
-
-  let notesWithGardenName = [];
-  garden_notes.forEach(note => {
-    let garden = gardens.find(g => g.id === note.garden_id);
-    if (garden) {
-      note.garden_name = garden.name;
-      notesWithGardenName.push(note);
-    }
+  // get garden notes
+  let gardenNotesCollection = await firestore().collection("garden_notes")
+  const gardenNoteBatches = [];
+  while (gardenIdsForNote.length) {
+    const batch = gardenIdsForNote.splice(0, 10);
+    gardenNoteBatches.push(gardenNotesCollection.where('garden_id', 'in', [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+  }
+  console.log("Batch: ", gardenNoteBatches.length)
+  const notesWithGardenName = []
+  await Promise.all(gardenNoteBatches).then(content => {
+    console.log(content.flat())
+    content.flat().forEach(gardenNoteData => {
+      console.log("Note: ", gardenNoteData)
+      const garden = gardens.find(g => g.id === gardenNoteData.garden_id)
+      if (garden) {
+        gardenNoteData.garden_name = garden.name;
+        notesWithGardenName.push(gardenNoteData);
+      }
+    })
   });
   return notesWithGardenName;
 };

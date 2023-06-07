@@ -9,45 +9,55 @@ export const getPlantNotes = async (withPlantNames = false) => {
     return []
   }
   const plantIds = [];
+  const plants = []
   const plantInfoList = []
-  let plantsRef = await firestore()
-    .collection('plants')
-    .where('garden_id', 'in', gardenIds)
-    .get();
-  const plants = plantsRef.docs.map(doc => {
-    const data = doc.data();
-    //data.created_at = String(data.created_at.toDate());
-    plantIds.push(data.id);
-    if(withPlantNames)
-      plantInfoList.push({id: data.id, name: data.name, plant_type: data.plant_type})
-    return data;
+
+  // construct plant batches (firestore limits batches to 10)
+  let plantsCollection = await firestore().collection('plants')
+  const plantBatches = [];
+  while (gardenIds.length) {
+    const batch = gardenIds.splice(0, 10);
+    plantBatches.push(plantsCollection.where('garden_id', 'in', [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+  }
+  // get plant ids
+  await Promise.all(plantBatches).then(content => {
+    content.flat().forEach(plantData => {
+      plants.push(plantData)
+      plantIds.push(plantData.id)
+      if(withPlantNames)
+        plantInfoList.push({id: plantData.id, name: plantData.name, plant_type: plantData.plant_type})
+    })
   });
+
   if(plantIds.length == 0){
     console.log("Empty plant id list.")
     return []
   }
-  let plantNoteRefs = await firestore()
-    .collection('plant_notes')
-    .where('plant_id', 'in', plantIds)
-    .orderBy('created_at', 'desc')
-    .get();
-  const plant_notes = plantNoteRefs.docs.map(doc => {
-    const data = doc.data();
-    //data.created_at = String(data.created_at.toDate());
-    return data;
+
+  // construct plant note batches
+  let plantNotesCollection = await firestore().collection("plant_notes")
+  const plantNoteBatches = []
+  while(plantIds.length){
+    const batch = plantIds.splice(0, 10)
+    plantNoteBatches.push(plantNotesCollection.where("plant_id", "in", [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+  }
+
+  // get plant notes 
+  let notesWithPlantName = [];
+  await Promise.all(plantNoteBatches).then(content => {
+    content.flat().forEach(plantNoteData => {
+      let plant = plants.find(p => p.id === plantNoteData.plant_id);
+      if (plant) {
+        plantNoteData.plant_name = plant.name;
+        notesWithPlantName.push(plantNoteData);
+      }
+    })
   });
 
-  let notesWithPlantName = [];
-  plant_notes.forEach(note => {
-    let plant = plants.find(p => p.id === note.plant_id);
-    if (plant) {
-      note.plant_name = plant.name;
-      notesWithPlantName.push(note);
-    }
-  });
   if(withPlantNames){
     return {notes: notesWithPlantName, plantInfo: plantInfoList}
   }
+
   return notesWithPlantName;
 };
 

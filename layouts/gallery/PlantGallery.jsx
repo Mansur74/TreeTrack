@@ -19,9 +19,11 @@ const PlantGallery = () => {
     const fetchData = async () => {
       setIsLoading(true);
       const plantNotesWithInfo = await getPlantNotes(true)
-      setNoteList(plantNotesWithInfo.notes);
-      setFilteredNoteList(plantNotesWithInfo.notes)
-      setPlantNames(plantNotesWithInfo.plantInfo)
+      if(plantNotesWithInfo.length !== 0){
+        setNoteList(plantNotesWithInfo.notes);
+        setFilteredNoteList(plantNotesWithInfo.notes)
+        setPlantNames(plantNotesWithInfo.plantInfo)
+      }
       setIsLoading(false);
     };
     fetchData();
