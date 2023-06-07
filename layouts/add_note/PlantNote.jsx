@@ -17,6 +17,7 @@ import Geolocation from '@react-native-community/geolocation';
 import storage from "@react-native-firebase/storage";
 import {useRoute} from '@react-navigation/native';
 import { insertPlantNote } from '../../services/plant_services';
+import { getPlantTypes, insertNewPlantType } from '../../services/plant_type_services';
 
 const PlantNote = ({navigation}) => {
   const [gardenList, setGardenList] = useState([]);
@@ -84,7 +85,14 @@ const PlantNote = ({navigation}) => {
   };
 
  const saveNote = async () => {
-    if (!selectedPlant) {
+    console.log("save'e basıldı")
+    try {
+      await getPlantTypes()
+    } catch (error) {
+      console.log("Hata: ", error)   
+    }
+   
+    /*if (!selectedPlant) {
       ToastAndroid.show(
         'You must select a plant to save note.',
         ToastAndroid.LONG,
@@ -122,7 +130,7 @@ const PlantNote = ({navigation}) => {
       } catch (error) {
         console.log('Insert plant note error: ', error);
       }
-    }
+    }*/
   }; 
   
   return (

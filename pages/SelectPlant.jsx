@@ -8,7 +8,6 @@ import {
   TextInput,
   Image,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
 import MapView, {PROVIDER_GOOGLE, Polygon, Marker} from 'react-native-maps';
@@ -19,29 +18,28 @@ import {getPlantsOfGarden, isInsidePolygon} from '../services/garden_services';
 import {insertNewPlant} from '../services/plant_services';
 import {setMapPositionByGardenArea} from '../services/helper';
 import AutocompleteInput from 'react-native-autocomplete-input';
+import { getPlantTypes, insertNewPlantType, searchPlantType } from '../services/plant_type_services';
 
-const plantTypeList = [
-  'Walnut',
-  'Olive',
-  'Tulip',
-  'Rose',
-  'Orange',
-  'Apple'
-];
 const SelectPlant = ({navigation}) => {
   const [selectedMapType, setMapType] = useState('standard');
   const [modalVisible, setModalVisible] = useState(false);
   const [newPlantName, setNewPlantName] = useState(null);
   const [newPlantLocation, setNewPlantLocation] = useState(null);
+  
+  // add new plant
   const addNewPlant = async () => {
     let newPlant = {
       created_at: new Date(),
       name: newPlantName,
-      plant_type: selectedPlantType,
       location: newPlantLocation,
       garden_id: selectedGarden.id,
     };
     try {
+      // search plant type
+      const searchPlantTypeResult = await searchPlantType(selectedPlantType, plantTypes)
+      newPlant.plant_type = searchPlantTypeResult.plant_type
+      // if new type is inserted, update the list
+      setPlantTypes(searchPlantTypeResult.plantTypes)
       const ref_id = await insertNewPlant(newPlant);
       setModalVisible(!modalVisible);
       ToastAndroid.show('New plant is saved.', ToastAndroid.SHORT);
@@ -72,7 +70,7 @@ const SelectPlant = ({navigation}) => {
       });
     });
   }, []);
-  console.log('============ Current position: ', currentPosition);
+  //console.log('============ Current position: ', currentPosition);
   const route = useRoute();
 
   const selectedGarden = route.params.selectedGarden;
@@ -81,6 +79,15 @@ const SelectPlant = ({navigation}) => {
   useEffect(() => {
     const fetchData = async () => {
       setPlantList(await getPlantsOfGarden(selectedGarden.id));
+    };
+    fetchData();
+  }, []);
+
+  const [plantTypes, setPlantTypes] = useState([]); 
+  // get plant types
+  useEffect(() => {
+    const fetchData = async () => {
+      setPlantTypes(await getPlantTypes());
     };
     fetchData();
   }, []);
@@ -160,8 +167,7 @@ const SelectPlant = ({navigation}) => {
     initialMessage = 'This garden has no plant';
   }
   const [selectedPlant, setSelectedPlant] = useState(null);
-  //const [newPlantType, setPickerValue] = useState(plantTypes[0]);
-  const [plantTypes, setPlantTypes] = useState(plantTypeList); // Example garden types
+  
   const [selectedPlantType, setSelectedPlantType] = useState('');
   const [isHidden, setShowAutoCompleteResult] = useState(true);
   const findPlantTypes = searchText => {

@@ -6,15 +6,15 @@ import {
   Image,
   ScrollView,
   ToastAndroid,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PhotoPick from '../layouts/photo_picker/ImagePicker';
-import storage from "@react-native-firebase/storage"
-import { insertGarden } from '../services/garden_services';
+import storage from '@react-native-firebase/storage';
+import {insertGarden} from '../services/garden_services';
 import AutocompleteInput from 'react-native-autocomplete-input';
 
 // fake data - TODO: retrieve from API
@@ -25,128 +25,94 @@ const gardenTypeList = [
   'Rose garden',
   'Water garden',
 ];
-const CreateGarden = ({ route, navigation }) => {
-  const onUpdate = route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
-  const polygon = route.params && route.params.coordinates ? route.params.coordinates : [];
-  const [imagePath, setSelectedImage] = useState(null);
+const CreateGarden = ({route, navigation}) => {
+  const onUpdate =
+    route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
+  const polygon =
+    route.params && route.params.coordinates ? route.params.coordinates : [];
   const [gardenName, setGardenName] = useState(null);
-  const [gardenNote, setGardenNote] = useState(null);
-  
-  const onSelectImage = image => {
-    if (!image) {
-      setSelectedImage(null);
-    } else {
-      setSelectedImage(image.path);
-    }
-  };
 
   // add garden
   const addGarden = async () => {
-
-    let imageUrl = null
-    if (imagePath != null) {
-      const imageName = imagePath.split('/').pop();
-      await uploadImage(imagePath, 'gardens');
-      console.log('Image is saved');
-      imageUrl = await getImageUrl('gardens', imageName);
-      console.log('URL of saved image: ', imageUrl);
-    }
     const gardenData = {
       name: gardenName,
       created_at: new Date(),
       polygon: polygon,
-      image_url: imageUrl,
-      garden_type: selectedGardenType
+      garden_type: selectedGardenType,
     };
-    // TODO: bahçe notunu da kaydet? 
+    // TODO: bahçe notunu da kaydet?
     try {
       await insertGarden(gardenData);
       ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
       onUpdate();
-      navigation.navigate('Gardens');  
+      navigation.navigate('Gardens');
     } catch (error) {
-      console.log("Insert garden error: ", error)
+      console.log('Insert garden error: ', error);
     }
-    
   };
 
-  const uploadImage = async (imageUri, folderName) => {
-    const imageRef = storage().ref(`${folderName}/${imageUri.split('/').pop()}`,
-    );
-    const response = await fetch(imageUri);
-    console.log('\nuploadImage response: ', response.status, ' ', response);
-    const blob = await response.blob();
-
-    await imageRef.put(blob);
-  }
-
-  const getImageUrl = async (folderName, imageName) => {
-    const imageRef = storage().ref(`${folderName}/${imageName}`);
-    return await imageRef.getDownloadURL();
-  }
   const [gardenTypes, setGardenTypes] = useState(gardenTypeList); // Example garden types
   const [selectedGardenType, setSelectedGardenType] = useState('');
-  const [isHidden, setShowAutoCompleteResult] = useState(true)
-  const findGardenTypes = (searchText) => {
+  const [isHidden, setShowAutoCompleteResult] = useState(true);
+  const findGardenTypes = searchText => {
     if (searchText === '') {
       return [];
     }
-    const filteredGardenTypes = gardenTypes.filter((gardenType) =>
-      gardenType.toLowerCase().includes(searchText.toLowerCase())
+    const filteredGardenTypes = gardenTypes.filter(gardenType =>
+      gardenType.toLowerCase().includes(searchText.toLowerCase()),
     );
     return filteredGardenTypes;
   };
 
-  const handleSelection = (item) => {
+  const handleSelection = item => {
     setSelectedGardenType(item);
-    setShowAutoCompleteResult(true)
+    setShowAutoCompleteResult(true);
   };
-  
+
   return (
     <LinearGradient
       colors={['#D1A96DE5', '#DB966FE5']}
-      style={{ height: '100%' }}>
-      <View style={{ padding: 20, flex: 1, marginBottom: 110 }}>
+      style={{height: '100%'}}>
+      <View style={{padding: 20, flex: 1, marginBottom: 110}}>
         <Text style={styles.text}>add a new garden</Text>
-        <Text style={styles.t4}>Add a photo of your garden</Text>
-            <PhotoPick onSelect={onSelectImage}></PhotoPick>
-            <Text style={styles.t4}>Give a name to your garden</Text>
-            <TextInput
-              value={gardenName}
-              onChangeText={text => setGardenName(text)}
-              placeholderTextColor={'#21212160'}
-              placeholder="Garden Name"
-              style={{
-                width: '100%',
-                height: 42,
-                paddingStart: 10,
-                paddingEnd: 10,
-                backgroundColor: 'white',
-                borderRadius: 10,
-                borderWidth: 0,
-                color: '#212121',
-                textAlignVertical: 'top',
-                elevation: 5,
-                fontSize: 16,
-              }}></TextInput>
-            <Text style={styles.t4}>Select garden type</Text>
-            <View 
-              style={{
-                width: '100%',
-                height: isHidden ? 42 : 150,
-                borderWidth: 0,
-                borderRadius: 5,
-                marginBottom: isHidden ? 0 : 30
+        {/* add garden section */}
+        <View>
+          <Text style={styles.t4}>Give a name to your garden</Text>
+          <TextInput
+            value={gardenName}
+            onChangeText={text => setGardenName(text)}
+            placeholderTextColor={'#21212160'}
+            placeholder="Garden Name"
+            style={{
+              width: '100%',
+              height: 42,
+              paddingStart: 10,
+              paddingEnd: 10,
+              backgroundColor: 'white',
+              borderRadius: 10,
+              borderWidth: 0,
+              color: '#212121',
+              textAlignVertical: 'top',
+              elevation: 5,
+              fontSize: 16,
+            }}></TextInput>
+          <Text style={styles.t4}>Select garden type</Text>
+          <View
+            style={{
+              width: '100%',
+              height: isHidden ? 42 : 150,
+              borderWidth: 0,
+              borderRadius: 5,
+              marginBottom: isHidden ? 0 : 30,
             }}>
             <AutocompleteInput
               data={findGardenTypes(selectedGardenType)}
               defaultValue={selectedGardenType}
-              onChangeText={(text) => {
-                setSelectedGardenType(text) 
-                setShowAutoCompleteResult(false)
+              onChangeText={text => {
+                setSelectedGardenType(text);
+                setShowAutoCompleteResult(false);
               }}
-              
-              hideResults = {isHidden}
+              hideResults={isHidden}
               style={{
                 width: '100%',
                 height: 42,
@@ -160,42 +126,37 @@ const CreateGarden = ({ route, navigation }) => {
                 elevation: 5,
                 fontSize: 16,
               }}
-              placeholder='Enter garden type'
+              placeholder="Enter garden type"
               placeholderTextColor={'#21212160'}
               flatListProps={{
                 keyExtractor: (_, idx) => idx,
-                renderItem: ({ item }) => 
-                <TouchableOpacity 
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 5
-                  }}
-                  onPress={() => handleSelection(item)}>
-                  <Text 
+                renderItem: ({item}) => (
+                  <TouchableOpacity
                     style={{
                       borderWidth: 0,
-                      padding: 10,
-                      color:"#212121"
+                      borderRadius: 5,
                     }}
-                    >{item}</Text>
-              </TouchableOpacity>,
+                    onPress={() => handleSelection(item)}>
+                    <Text
+                      style={{
+                        borderWidth: 0,
+                        padding: 10,
+                        color: '#212121',
+                      }}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                ),
               }}
             />
-
-            </View>
-
-         
-            
-
-        <ScrollView>
+          </View>
           <View
             style={{
               padding: 10,
               width: '100%',
             }}>
-            
             <Text style={styles.t4}>Add location of your garden</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <TouchableOpacity
                 style={{
                   ...styles.button_left,
@@ -213,7 +174,7 @@ const CreateGarden = ({ route, navigation }) => {
                     width: 25,
                     height: 25,
                   }}></Image>
-                <Text style={{ ...styles.bt1, color: '#212121', marginLeft: 5 }}>
+                <Text style={{...styles.bt1, color: '#212121', marginLeft: 5}}>
                   Open Map
                 </Text>
               </TouchableOpacity>
@@ -228,27 +189,13 @@ const CreateGarden = ({ route, navigation }) => {
                   }}></Image>
               )}
             </View>
-
-            <Text style={styles.t4}>Enter your notes</Text>
-            <TextInput
-              value={gardenNote}
-              onChangeText={text => setGardenNote(text)}
-              placeholderTextColor={'#21212160'}
-              multiline
-              numberOfLines={3}
-              placeholder="Garden notes..."
-              style={styles.text_area}
-            />
-
-            <TouchableOpacity
-              style={{ ...styles.button_right, width: 125 }}
-              onPress={addGarden}>
-              <Text style={{ ...styles.bt1 }}>
-                Save
-              </Text>
-            </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
+        <TouchableOpacity
+            style={{...styles.button_right, width: 125}}
+            onPress={addGarden}>
+            <Text style={{...styles.bt1}}>Save</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
