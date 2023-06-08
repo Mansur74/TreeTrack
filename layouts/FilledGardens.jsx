@@ -51,7 +51,7 @@ const FilledGardens = ({ navigation, gardens, onUpdate }) => {
             </ScrollView>
 
             <TouchableOpacity
-              style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130 }}
+              style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 10, bottom: 130 }}
               onPress={() => {
                 navigation.navigate("CreateGarden", {onUpdate: onUpdate})
               }}

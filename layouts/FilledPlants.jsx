@@ -56,7 +56,7 @@ const FilledPlants = ({ navigation, garden, plants, onUpdate }) => {
 
 						<TouchableOpacity
 						  onPress={() => {navigation.navigate("CreatePlant", {garden: garden}, {onUpdate: onUpdate})}}
-							style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 20, bottom: 130 }}
+							style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 10, bottom: 130 }}
 
 						>
 

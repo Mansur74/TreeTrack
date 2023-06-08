@@ -5,7 +5,8 @@ import {
   TextInput,
   ScrollView,
   ToastAndroid,
-  Image
+  Image,
+  KeyboardAvoidingView
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../../styles/Style';
@@ -181,9 +182,12 @@ const PlantNote = ({navigation}) => {
               <Text style={{ ...styles.bt1, color: '#212121', marginLeft: 5 }}> Open Map </Text>
             </TouchableOpacity>
             
-          </View>
-          
+          </View> 
           <Text style={styles.t4}>Enter your notes</Text>
+          <KeyboardAvoidingView 
+            behavior='padding'
+            keyboardVerticalOffset={10}
+            >
           <TextInput
             value={plantNote}
             onChangeText={text => setPlantNote(text)}
@@ -200,6 +204,9 @@ const PlantNote = ({navigation}) => {
             onPress={saveNote}>
             <Text style={styles.bt1}> Save Note </Text>
           </TouchableOpacity>
+          </KeyboardAvoidingView>
+          
+          
         </View>
       </ScrollView>
     </LinearGradient>

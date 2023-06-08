@@ -3,7 +3,7 @@ import {getFromStorage} from './storage';
 import * as geolib from 'geolib';
 import { getSortedPlantsByDistance } from './plant_services';
 
-export const getUserGardens = async () => {
+export const getUserGardens = async (getLastImage = false) => {
   const user_uid = await getFromStorage('userId');
   //console.log("Uid: ", user_uid)
   const userGardensRef = firestore().collection('user_gardens');
@@ -21,6 +21,23 @@ export const getUserGardens = async () => {
     return data;
   });
   const gardenList = await Promise.all(gardenPromises);
+  // get last image of the garden if it's wanted
+  if(getLastImage){
+    const gardenImagesPromises = gardenList.map(async (garden) => {
+      // get last image
+      const notDoc = await firestore().collection("garden_notes").where("garden_id", "==", garden.id).orderBy("created_at", "desc").limit(1).get()
+      const data = notDoc.docs.map(d => {return d.data()})
+      return {garden_id: garden.id, data}
+    })
+    const gardenImageList = await Promise.all(gardenImagesPromises)
+    // add images to garden items
+    gardenList.forEach(garden => {
+      const gardenImage = gardenImageList.find(i => i.garden_id == garden.id)
+      if(gardenImage && gardenImage.data.length !== 0){
+        garden.image_url = gardenImage.data[0].image_url
+      }
+    });
+  }
   // sort desc (gallery kısmında daha fazla sort seçeneği olacak)
   gardenList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -112,7 +129,7 @@ export const insertGarden = async gardenData => {
   });
 };
 
-export const getPlantsOfGarden = async garden_id => {
+export const getPlantsOfGarden = async (garden_id, getLastImage) => {
   const querySnapshot = await firestore()
     .collection('plants')
     .where('garden_id', '==', garden_id)
@@ -122,6 +139,25 @@ export const getPlantsOfGarden = async garden_id => {
     //data.created_at = String(data.created_at.toDate());
     return data;
   });
+    // get last image of the plant if it's wanted
+  if(getLastImage){
+    const plantImagesPromises = plantList.map(async (plant) => {
+      // get last image
+      console.log("plant: ", plant)
+      const notDoc = await firestore().collection("plant_notes").where("plant_id", "==", plant.id).orderBy("created_at", "desc").limit(1).get()
+      const data = notDoc.docs.map(d => {return d.data()})
+      console.log("dataaaaa: ", data)
+      return {plant_id: plant.id, data}
+    })
+    const plantImageList = await Promise.all(plantImagesPromises)
+    // add images to plant items
+    plantList.forEach(plant => {
+      const plantImage = plantImageList.find(i => i.plant_id == plant.id)
+      if(plantImage && plantImage.data.length !== 0){
+        plant.image_url = plantImage.data[0].image_url
+      }
+    });
+  }
   // console.log("Plant list: ", plantList)
   return plantList;
 };

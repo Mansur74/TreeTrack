@@ -4,27 +4,15 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  ScrollView,
   ToastAndroid,
-  KeyboardAvoidingView,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../styles/Style';
-import React, {useState} from 'react';
-import PhotoPick from '../layouts/photo_picker/ImagePicker';
-import storage from '@react-native-firebase/storage';
+import React, {useState, useEffect} from 'react';
 import {insertGarden} from '../services/garden_services';
 import AutocompleteInput from 'react-native-autocomplete-input';
+import { getGardenTypes, searchGardenType } from '../services/garden_type_sevice';
 
-// fake data - TODO: retrieve from API
-const gardenTypeList = [
-  'Farm',
-  'Container Garden',
-  'Ferennial garden',
-  'Rose garden',
-  'Water garden',
-];
 const CreateGarden = ({route, navigation}) => {
   const onUpdate =
     route.params && route.params.onUpdate ? route.params.onUpdate : () => {};
@@ -32,16 +20,31 @@ const CreateGarden = ({route, navigation}) => {
     route.params && route.params.coordinates ? route.params.coordinates : [];
   const [gardenName, setGardenName] = useState(null);
 
+  const [gardenTypes, setGardenTypes] = useState([]);
+  // get garden types
+  useEffect(() => {
+    const fetchData = async () => {
+      setGardenTypes(await getGardenTypes());
+    };
+    fetchData();
+  }, []);
+
   // add garden
   const addGarden = async () => {
     const gardenData = {
       name: gardenName,
       created_at: new Date(),
       polygon: polygon,
-      garden_type: selectedGardenType,
     };
-    // TODO: bahçe notunu da kaydet?
     try {
+      // search garden type
+      const searchGardenTypeResult = await searchGardenType(
+        selectedGardenType,
+        gardenTypes,
+      );
+      gardenData.garden_type = searchGardenTypeResult.garden_type;
+      // if new type is inserted, update the list
+      setGardenTypes(searchGardenTypeResult.gardenTypes);
       await insertGarden(gardenData);
       ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
       onUpdate();
@@ -51,7 +54,6 @@ const CreateGarden = ({route, navigation}) => {
     }
   };
 
-  const [gardenTypes, setGardenTypes] = useState(gardenTypeList); // Example garden types
   const [selectedGardenType, setSelectedGardenType] = useState('');
   const [isHidden, setShowAutoCompleteResult] = useState(true);
   const findGardenTypes = searchText => {
@@ -59,8 +61,8 @@ const CreateGarden = ({route, navigation}) => {
       return [];
     }
     const filteredGardenTypes = gardenTypes.filter(gardenType =>
-      gardenType.toLowerCase().includes(searchText.toLowerCase()),
-    );
+      gardenType.toLowerCase().includes(searchText.toLowerCase())
+    );   
     return filteredGardenTypes;
   };
 

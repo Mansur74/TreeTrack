@@ -6,13 +6,13 @@ import {getUserGardens} from "../services/garden_services";
 const Gardens = ({ navigation }) => {
   const [gardens, setGardens] = useState([])
   const updateGardens = async () => {
-    const data = await getUserGardens();
+    const data = await getUserGardens(true);
     setGardens(data);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getUserGardens();
+      const data = await getUserGardens(true);
       setGardens(data);
     };
     fetchData();

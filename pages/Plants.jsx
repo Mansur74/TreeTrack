@@ -8,13 +8,13 @@ const Plants = ({ navigation, route }) => {
 	const garden = route.params.garden;
 	const [plants, setPlants] = useState([])
 	const updatePlants = async () => {
-		const data = await getPlantsOfGarden(garden.id)
+		const data = await getPlantsOfGarden(garden.id, true)
 		setPlants(data);
 	};
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const data = await getPlantsOfGarden(garden.id)
+			const data = await getPlantsOfGarden(garden.id, true)
 			setPlants(data);
 		};
 		fetchData();

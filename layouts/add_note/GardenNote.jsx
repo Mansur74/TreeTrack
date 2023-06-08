@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   ToastAndroid,
+  KeyboardAvoidingView
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../../styles/Style';
@@ -148,19 +149,25 @@ const GardenNote = ({navigation}) => {
           </View>
 
           <Text style={styles.t4}>Enter your notes</Text>
-          <TextInput
-            value={gardenNote}
-            onChangeText={text => setTextInputValue(text)}
-            multiline
-            numberOfLines={5}
-            placeholder="Garden notes..."
-            placeholderTextColor={'#21212160'}
-            style={styles.text_area}
-          />
-          {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}
-          <TouchableOpacity style={styles.button_right} onPress={saveNote}>
-            <Text style={styles.bt1}> Save </Text>
-          </TouchableOpacity>
+          <KeyboardAvoidingView 
+            behavior='padding'
+            keyboardVerticalOffset={10}
+            >
+            <TextInput
+              value={gardenNote}
+              onChangeText={text => setTextInputValue(text)}
+              multiline
+              numberOfLines={5}
+              placeholder="Garden notes..."
+              placeholderTextColor={'#21212160'}
+              style={styles.text_area}
+            />
+            {/* TODO: fotoğraf seçilince küçük ekranlarda bu buton navbar'ın altında kalıyor */}
+            <TouchableOpacity style={styles.button_right} onPress={saveNote}>
+              <Text style={styles.bt1}> Save </Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        
         </View>
       </ScrollView>
     </LinearGradient>
