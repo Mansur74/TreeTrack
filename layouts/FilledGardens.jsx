@@ -1,11 +1,20 @@
-import { View, Text, Image, FlatList, ScrollView } from "react-native"
+import { View, Text, Image, RefreshControl, ScrollView } from "react-native"
 import LinearGradient from "react-native-linear-gradient";
-import styles from "../styles/Style";
 import { TouchableOpacity } from "react-native";
 import GardenCard from "./GardenCard";
 import { MenuProvider } from "react-native-popup-menu";
+import { useState, useCallback } from "react";
+import { getUserGardens } from "../services/garden_services";
 
 const FilledGardens = ({ navigation, gardens, onUpdate }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [gardenList, setGardenList] = useState(gardens)
+  const onRefresh = useCallback(async() => {
+    setRefreshing(true);
+    const data = await getUserGardens(true);
+    setRefreshing(false);
+    setGardenList(data);
+  }, []);
   return (
     <LinearGradient
       colors={["#FFFFFF", "#FFFFFF"]}
@@ -37,11 +46,13 @@ const FilledGardens = ({ navigation, gardens, onUpdate }) => {
             <ScrollView
               style={{
                 marginBottom: 100
-              }}>
+              }}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 
               <MenuProvider>
                 {
-                  gardens.map(garden =>
+                  gardenList.map(garden =>
                     <GardenCard navigation={navigation} key={garden.id} garden={garden} onUpdate={onUpdate}/>
                   )
                 }

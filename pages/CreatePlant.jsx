@@ -54,7 +54,7 @@ const CreatePlant = ({route, navigation}) => {
       await insertNewPlant(plantData);
       ToastAndroid.show('Plant is added.', ToastAndroid.SHORT);
       onUpdate();
-      navigation.navigate('Gardens');
+      navigation.navigate('Plants', {garden});
     } catch (error) {
       console.log('Insert plant error: ', error);
     }

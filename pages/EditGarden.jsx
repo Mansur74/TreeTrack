@@ -22,7 +22,7 @@ const EditGarden = ({ navigation }) => {
     const [gardenNote, setTextInputValue] = useState('');
     const [gardenName, setGardenName] = useState(garden.name);
 
-    const handleUpdatePlant = async () => {
+    const handleUpdateGarden = async () => {
         const updated_garden = garden
         if(newGardenArea.length > 2){
             updated_garden.polygon = newGardenArea
@@ -33,6 +33,7 @@ const EditGarden = ({ navigation }) => {
         try {
             await updateGarden(garden.id, updated_garden)
             ToastAndroid.show("Garden is updated.", ToastAndroid.SHORT)
+            navigation.navigate("Gardens")
             // TODO: Navigate?
         } catch (error) {
             console.log("Error garden update: ", error)
@@ -94,7 +95,7 @@ const EditGarden = ({ navigation }) => {
                             placeholderTextColor={'#21212160'}
                             style={styles.text_area}
                         />
-                        <TouchableOpacity style={styles.button_right} onPress={handleUpdatePlant}>
+                        <TouchableOpacity style={styles.button_right} onPress={handleUpdateGarden}>
                             <Text style={styles.bt1}> Update </Text>
                         </TouchableOpacity>
                     </View>

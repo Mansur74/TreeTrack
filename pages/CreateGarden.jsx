@@ -48,7 +48,7 @@ const CreateGarden = ({route, navigation}) => {
       await insertGarden(gardenData);
       ToastAndroid.show('Garden is saved.', ToastAndroid.SHORT);
       onUpdate();
-      navigation.navigate('Gardens');
+      navigation.navigate('GardensStack', {screen: 'Gardens'});
     } catch (error) {
       console.log('Insert garden error: ', error);
     }

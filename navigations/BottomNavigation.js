@@ -50,6 +50,7 @@ const BottomNavigation = ({ setIsSigned }) => {
           name="AddNoteStack"
           component={AddNoteStack}
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
@@ -70,6 +71,7 @@ const BottomNavigation = ({ setIsSigned }) => {
           name="Map"
           component={Map}
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
@@ -91,6 +93,7 @@ const BottomNavigation = ({ setIsSigned }) => {
           name="GardensStack"
           component={GardensStack}
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
@@ -111,6 +114,7 @@ const BottomNavigation = ({ setIsSigned }) => {
           name="Galleries"
           component={Galleries}
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
@@ -130,6 +134,7 @@ const BottomNavigation = ({ setIsSigned }) => {
         <Tab.Screen
           name="SettingsStack"
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => (
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Image
@@ -214,6 +219,13 @@ const AddNoteStack = () => {
       <Stack.Screen name="AddNote" component={AddNote} />
       <Stack.Screen name="SelectPlant" component={SelectPlant} />
       <Stack.Screen name="PlantNote" component={PlantNote} />
+      <Stack.Screen
+        name="DrawPolygon"
+        component={DrawPolygon} />
+
+      <Stack.Screen
+        name="CreateGarden"
+        component={CreateGarden} />
     </Stack.Navigator>
   );
 }

@@ -7,10 +7,8 @@ export const getGardenTypes = async () =>{
   const gardenTypesRef = firestore().collection('garden_types').where('user_id', 'in', [user_uid, "1"]);
   const gardenTypes = await gardenTypesRef.get();
   const gardenTypeList = [] 
-  console.log("buradayım: ", gardenTypes.empty)
   gardenTypes.docs.map(async doc => {
     const garden_type = doc.data().garden_type;
-    console.log("gtttT: ", garden_type)
     gardenTypeList.push(garden_type)
   })
   gardenTypeList.sort((a, b) => a.localeCompare(b))

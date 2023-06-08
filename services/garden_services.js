@@ -133,6 +133,7 @@ export const getPlantsOfGarden = async (garden_id, getLastImage) => {
   const querySnapshot = await firestore()
     .collection('plants')
     .where('garden_id', '==', garden_id)
+    .orderBy("created_at", "desc")
     .get();
   const plantList = querySnapshot.docs.map(doc => {
     const data = doc.data();
@@ -143,10 +144,8 @@ export const getPlantsOfGarden = async (garden_id, getLastImage) => {
   if(getLastImage){
     const plantImagesPromises = plantList.map(async (plant) => {
       // get last image
-      console.log("plant: ", plant)
       const notDoc = await firestore().collection("plant_notes").where("plant_id", "==", plant.id).orderBy("created_at", "desc").limit(1).get()
       const data = notDoc.docs.map(d => {return d.data()})
-      console.log("dataaaaa: ", data)
       return {plant_id: plant.id, data}
     })
     const plantImageList = await Promise.all(plantImagesPromises)
@@ -201,12 +200,9 @@ export const getGardenNotes = async () => {
     const batch = gardenIdsForNote.splice(0, 10);
     gardenNoteBatches.push(gardenNotesCollection.where('garden_id', 'in', [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
   }
-  console.log("Batch: ", gardenNoteBatches.length)
   const notesWithGardenName = []
   await Promise.all(gardenNoteBatches).then(content => {
-    console.log(content.flat())
     content.flat().forEach(gardenNoteData => {
-      console.log("Note: ", gardenNoteData)
       const garden = gardens.find(g => g.id === gardenNoteData.garden_id)
       if (garden) {
         gardenNoteData.garden_name = garden.name;
@@ -303,4 +299,13 @@ export const getSortedGardensWithPlants = async (userLocation)=>{
 
 export const updateGarden = async (gardenId, newGardenData) => {
   await firestore().collection('gardens').doc(gardenId).update(newGardenData);
+}
+// kullanıcının bahçesi yoksa true döner
+export const isEmptyGarden = async ()=>{
+  const user_uid = await getFromStorage('userId');
+  //console.log("Uid: ", user_uid)
+  const userGardensRef = firestore().collection('user_gardens');
+  const query = userGardensRef.where('user_uid', '==', user_uid);
+  const isEmpty = (await query.get()).empty;
+  return isEmpty
 }
