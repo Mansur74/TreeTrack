@@ -65,14 +65,14 @@ const FilledPlants = ({ navigation, garden, plants, onUpdate }) => {
 
 						<TouchableOpacity
 						  onPress={() => {navigation.navigate("CreatePlant", {garden: garden}, {onUpdate: onUpdate})}}
-							style={{ position: "absolute", backgroundColor: "#FFF1DD", padding: 20, borderRadius: 50, end: 10, bottom: 130 }}
+							style={{ position: "absolute", end: 10, bottom: 130 }}
 
 						>
 
 							<Image
-								source={require("../images/icons/plus.png")}
+								source={require("../images/icons/plus3.png")}
 								resizeMode="stretch"
-								style={{ height: 25, width: 25 }}
+								style={{ height: 65, width: 65 }}
 							>
 
 							</Image>

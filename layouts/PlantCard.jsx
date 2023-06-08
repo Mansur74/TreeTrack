@@ -29,7 +29,7 @@ const PlantCard = ({ navigation, plant, garden, onUpdate }) => {
 				<View
 					style={{
 						width: '75%',
-						backgroundColor: '#D9D9D9',
+						backgroundColor: '#ffffff70',
 						padding: 10,
 						borderRadius: 10,
 					}}>

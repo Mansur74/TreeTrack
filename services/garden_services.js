@@ -25,7 +25,7 @@ export const getUserGardens = async (getLastImage = false) => {
   if(getLastImage){
     const gardenImagesPromises = gardenList.map(async (garden) => {
       // get last image
-      const notDoc = await firestore().collection("garden_notes").where("garden_id", "==", garden.id).orderBy("created_at", "desc").limit(1).get()
+      const notDoc = await firestore().collection("garden_notes").where("garden_id", "==", garden.id).orderBy("created_at", "desc").get()
       const data = notDoc.docs.map(d => {return d.data()})
       return {garden_id: garden.id, data}
     })
@@ -37,6 +37,20 @@ export const getUserGardens = async (getLastImage = false) => {
         garden.image_url = gardenImage.data[0].image_url
       }
     });
+    for(let i = 0; i<gardenList.length; i++){
+      const gardenEntity = gardenList[i]
+      const gardenNotes = gardenImageList.find(i => i.garden_id == gardenEntity.id)
+      if(gardenNotes && gardenNotes.data != null && gardenNotes.data.length !== 0){
+        // find the latest uploaded image from notes
+        for(let j = 0; j<gardenNotes.data.length; j++){
+          const g_note =  gardenNotes.data[j]
+          if(g_note.image_url !== null){
+            gardenEntity.image_url = g_note.image_url
+            break
+          }
+        }
+      }
+    }
   }
   // sort desc (gallery kısmında daha fazla sort seçeneği olacak)
   gardenList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -144,18 +158,26 @@ export const getPlantsOfGarden = async (garden_id, getLastImage) => {
   if(getLastImage){
     const plantImagesPromises = plantList.map(async (plant) => {
       // get last image
-      const notDoc = await firestore().collection("plant_notes").where("plant_id", "==", plant.id).orderBy("created_at", "desc").limit(1).get()
+      const notDoc = await firestore().collection("plant_notes").where("plant_id", "==", plant.id).orderBy("created_at", "desc").get()
       const data = notDoc.docs.map(d => {return d.data()})
       return {plant_id: plant.id, data}
     })
     const plantImageList = await Promise.all(plantImagesPromises)
     // add images to plant items
-    plantList.forEach(plant => {
+    for(let i = 0; i<plantList.length; i++){
+      const plant = plantList[i]
       const plantImage = plantImageList.find(i => i.plant_id == plant.id)
-      if(plantImage && plantImage.data.length !== 0){
-        plant.image_url = plantImage.data[0].image_url
+      if(plantImage && plantImage.data != null && plantImage.data.length !== 0){
+        // find the latest uploaded image from notes
+        for(let j = 0; j<plantImage.data.length; j++){
+          const p_note =  plantImage.data[j]
+          if(p_note.image_url !== null){
+            plant.image_url = p_note.image_url
+            break
+          }
+        }
       }
-    });
+    }
   }
   // console.log("Plant list: ", plantList)
   return plantList;
