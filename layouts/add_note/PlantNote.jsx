@@ -85,14 +85,7 @@ const PlantNote = ({navigation}) => {
   };
 
  const saveNote = async () => {
-    console.log("save'e basıldı")
-    try {
-      await getPlantTypes()
-    } catch (error) {
-      console.log("Hata: ", error)   
-    }
-   
-    /*if (!selectedPlant) {
+    if (!selectedPlant) {
       ToastAndroid.show(
         'You must select a plant to save note.',
         ToastAndroid.LONG,
@@ -130,7 +123,7 @@ const PlantNote = ({navigation}) => {
       } catch (error) {
         console.log('Insert plant note error: ', error);
       }
-    }*/
+    }
   }; 
   
   return (
