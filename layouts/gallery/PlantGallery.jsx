@@ -246,7 +246,7 @@ const PlantGallery = () => {
                   style={{width: 250, height: 250, borderRadius: 8}}
                   source={
                     pressedItem.image_url == null
-                      ? require('../../images/default_garden.jpg')
+                      ? require('../../images/default_plant.png')
                       : {uri: pressedItem.image_url}
                   }
                 />

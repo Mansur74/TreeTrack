@@ -39,7 +39,7 @@ export const getPlantNotes = async (withPlantNames = false) => {
   const plantNoteBatches = []
   while(plantIds.length){
     const batch = plantIds.splice(0, 10)
-    plantNoteBatches.push(plantNotesCollection.where("plant_id", "in", [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+    plantNoteBatches.push(plantNotesCollection.where("plant_id", "in", [...batch]).orderBy("created_at", "desc").get().then(results => results.docs.map(result => ({...result.data() }) )))
   }
 
   // get plant notes 

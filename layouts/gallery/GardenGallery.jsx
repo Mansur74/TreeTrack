@@ -212,7 +212,7 @@ if (isLoading || filteredNoteList.length == 0) {
                 style={{width: 150, height: 150}}
                 source={
                   item.image_url == null
-                    ? require('../../images/default_garden.jpg')
+                    ? require('../../images/default_garden.png')
                     : {uri: item.image_url}
                 }></Image>
               <Text style={{color: '#212121', marginTop: 5}}>{item.garden_name}</Text>
@@ -249,7 +249,7 @@ if (isLoading || filteredNoteList.length == 0) {
                   style={{width: 250, height: 250, borderRadius: 8}}
                   source={
                     pressedItem.image_url == null
-                      ? require('../../images/default_garden.jpg')
+                      ? require('../../images/default_garden.png')
                       : {uri: pressedItem.image_url}
                   }
                 />

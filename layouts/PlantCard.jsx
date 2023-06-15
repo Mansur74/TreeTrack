@@ -1,7 +1,8 @@
-import { Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
+import { Dimensions, Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu"
 import { deletePlant } from "../services/plant_services";
 
+const {height} = Dimensions.get("window")
 // delete garden -> bu islemin digerleri gibi child componentlarda olması lazım
 const handleDelete = async (plantId, onUpdate) => {
 	try {
@@ -16,7 +17,7 @@ const handleDelete = async (plantId, onUpdate) => {
 const PlantCard = ({ navigation, plant, garden, onUpdate }) => {
 	const plant_image =
 		!plant.image_url
-			? 'https://cdn-icons-png.flaticon.com/512/3039/3039008.png'
+			? 'https://cdn-icons-png.flaticon.com/512/1892/1892747.png'
 			: plant.image_url;
 	return (
 		<TouchableOpacity onPress={()=>{navigation.navigate("ViewPlant", {plant, garden, onUpdate})}}>
@@ -36,7 +37,7 @@ const PlantCard = ({ navigation, plant, garden, onUpdate }) => {
 					<Image
 						style={{
 							width: '100%',
-							height: 200,
+							height: height*0.25,
 							marginBottom: 10,
 						}}
 						source={{
@@ -74,11 +75,11 @@ const PlantCard = ({ navigation, plant, garden, onUpdate }) => {
 									<View
 										style={{ backgroundColor: '#888888', height: 1, width: '100%' }}
 									/>
-									<MenuOption onSelect={() => alert(`Rename`)}>
+									{/* <MenuOption onSelect={() => alert(`Rename`)}>
 										<Text style={{ textAlign: 'center', color: '#212121' }}>
 											Rename
 										</Text>
-									</MenuOption>
+									</MenuOption> */}
 									<View
 										style={{ backgroundColor: '#888888', height: 1, width: '100%' }}
 									/>

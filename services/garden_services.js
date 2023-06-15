@@ -220,7 +220,7 @@ export const getGardenNotes = async () => {
   const gardenNoteBatches = [];
   while (gardenIdsForNote.length) {
     const batch = gardenIdsForNote.splice(0, 10);
-    gardenNoteBatches.push(gardenNotesCollection.where('garden_id', 'in', [...batch]).get().then(results => results.docs.map(result => ({...result.data() }) )))
+    gardenNoteBatches.push(gardenNotesCollection.where('garden_id', 'in', [...batch]).orderBy("created_at", "desc").get().then(results => results.docs.map(result => ({...result.data() }) )))
   }
   const notesWithGardenName = []
   await Promise.all(gardenNoteBatches).then(content => {

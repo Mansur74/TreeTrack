@@ -1,7 +1,8 @@
-import { Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
+import { Dimensions, Image, Text, ToastAndroid, TouchableOpacity, View } from "react-native"
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu"
 import { deleteGarden } from "../services/garden_services";
 
+const {height} = Dimensions.get("window")
 // delete garden -> bu islemin digerleri gibi child componentlarda olması lazım
 const handleDelete = async (gardenId, onUpdate) => {
   try {
@@ -37,7 +38,7 @@ const GardenCard = ({ navigation, garden, onUpdate }) => {
           <Image
             style={{
               width: '100%',
-              height: 200,
+              height: height * 0.25,
               marginBottom: 10,
             }}
             source={{
@@ -75,11 +76,11 @@ const GardenCard = ({ navigation, garden, onUpdate }) => {
                   <View
                     style={{ backgroundColor: '#888888', height: 1, width: '100%' }}
                   />
-                  <MenuOption onSelect={() => alert(`Rename`)}>
+                  {/* <MenuOption onSelect={() => alert(`Rename`)}>
                     <Text style={{ textAlign: 'center', color: '#212121' }}>
                       Rename
                     </Text>
-                  </MenuOption>
+                  </MenuOption> */}
                   <View
                     style={{ backgroundColor: '#888888', height: 1, width: '100%' }}
                   />

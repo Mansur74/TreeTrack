@@ -91,17 +91,6 @@ const EditPlant = ({ navigation }) => {
                                     }}/>
                             )}
                         </View>
-
-                        <Text style={styles.t4}>Edit plant note</Text>
-                        <TextInput
-                            value={plantNote}
-                            onChangeText={text => setTextInputValue(text)}
-                            multiline
-                            numberOfLines={5}
-                            placeholder="Plant notes..."
-                            placeholderTextColor={'#21212160'}
-                            style={styles.text_area}
-                        />
                         <TouchableOpacity style={styles.button_right} onPress={handleUpdatePlant}>
                             <Text style={styles.bt1}> Update </Text>
                         </TouchableOpacity>
