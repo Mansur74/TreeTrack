@@ -30,7 +30,6 @@ const SignUp = ({ setIsInSignIn, setIsSigned }) => {
             "user_uid": uid,
             "name": name,
             "email": email,
-            "remember_auth": rememberToggleCheckBox
           })
           setIsSigned(true);
           await saveUserId(uid, toggleCheckBox);

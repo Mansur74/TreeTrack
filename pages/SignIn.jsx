@@ -25,7 +25,6 @@ const SignIn = ({ setIsInSignIn, setIsSigned }) => {
               if (!firestoreDocument.exists) {
                 ToastAndroid.show('User does not exist!', ToastAndroid.SHORT);
               }
-              usersRef.update({remember_auth: toggleCheckBox});
               setIsSigned(true);
               await saveUserId(uid, toggleCheckBox);
               ToastAndroid.show(
